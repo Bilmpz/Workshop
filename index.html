@@ -1,0 +1,1394 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Oliver &amp; Idas oplæg</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2212%22%20fill%3D%22%232356D8%22/%3E%3Crect%20x%3D%225%22%20y%3D%225%22%20width%3D%2254%22%20height%3D%2254%22%20rx%3D%228%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%223%22/%3E%3Ccircle%20cx%3D%2232.0%22%20cy%3D%2215.0%22%20r%3D%223.4%22%20fill%3D%22%23FFCC00%22/%3E%3Ccircle%20cx%3D%2240.5%22%20cy%3D%2217.3%22%20r%3D%223.4%22%20fill%3D%22%23FFCC00%22/%3E%3Ccircle%20cx%3D%2246.7%22%20cy%3D%2223.5%22%20r%3D%223.4%22%20fill%3D%22%23FFCC00%22/%3E%3Ccircle%20cx%3D%2249.0%22%20cy%3D%2232.0%22%20r%3D%223.4%22%20fill%3D%22%23FFCC00%22/%3E%3Ccircle%20cx%3D%2246.7%22%20cy%3D%2240.5%22%20r%3D%223.4%22%20fill%3D%22%23FFCC00%22/%3E%3Ccircle%20cx%3D%2240.5%22%20cy%3D%2246.7%22%20r%3D%223.4%22%20fill%3D%22%23FFCC00%22/%3E%3Ccircle%20cx%3D%2232.0%22%20cy%3D%2249.0%22%20r%3D%223.4%22%20fill%3D%22%23FFCC00%22/%3E%3Ccircle%20cx%3D%2223.5%22%20cy%3D%2246.7%22%20r%3D%223.4%22%20fill%3D%22%23FFCC00%22/%3E%3Ccircle%20cx%3D%2217.3%22%20cy%3D%2240.5%22%20r%3D%223.4%22%20fill%3D%22%23FFCC00%22/%3E%3Ccircle%20cx%3D%2215.0%22%20cy%3D%2232.0%22%20r%3D%223.4%22%20fill%3D%22%23FFCC00%22/%3E%3Ccircle%20cx%3D%2217.3%22%20cy%3D%2223.5%22%20r%3D%223.4%22%20fill%3D%22%23FFCC00%22/%3E%3Ccircle%20cx%3D%2223.5%22%20cy%3D%2217.3%22%20r%3D%223.4%22%20fill%3D%22%23FFCC00%22/%3E%3C/svg%3E">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@300;400;600;700;800;900&family=Overpass+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   ROUTE//EU · v0.3 · design-tokens
+   Idé: europæisk vejskilt. EU-blå flader, gul vejstribe som eneste accent,
+   skarpe kanter, Overpass (bygget på motorvejsskiltenes skrift).
+   Layout: én skærm. Fladen er delt med 1 px streger som en kodeeditor:
+   kort + log til venstre, bane + editor til højre.
+   Skift farver og skrift HER. Se DESIGN.md.
+   ===================================================================== */
+:root{
+  /* Flader */
+  --ink:#102A6E;          /* dybeste flade: bag kortet, felter, streger mellem paneler */
+  --surface:#173689;      /* paneler */
+  --surface-2:#1F44A0;    /* knapper ved hover */
+  --sign:#2356D8;         /* klar skiltblå: login-skiltet, pausen, målet på kortet */
+  --line:#2C4DA8;         /* tynde streger */
+  --line-strong:#4566C4;  /* kanter på knapper og felter */
+
+  /* Tekst */
+  --text:#FFFFFF;
+  --text-2:#D0DAF8;
+  --text-3:#9CAEE4;
+
+  /* Accent: gul vejstribe. Kun til primær handling, nuværende bane, mål og point */
+  --yellow:#FFCC00;
+  --yellow-ink:#0E2363;
+
+  /* Status */
+  --ok:#3DDC84;
+  --warn:#FFA62B;
+  --bad:#FF5A4E;
+
+  /* Kode */
+  --code-bg:#0E2560;
+  --code-kw:#FFCC00; --code-fn:#9CC2FF; --code-str:#8BEBC4;
+  --code-num:#FFBE8C; --code-com:#8296D2; --code-gutter:#5770B8;
+
+  /* Kortet */
+  --map-hue:222;
+  --map-road:#4A67C2;
+  --map-edge:rgba(255,255,255,.32);
+  --map-land-l:21;        /* terrænets lyshed i procent */
+  --map-package:#D9A066;
+
+  /* Skrift */
+  --font-ui:"Overpass","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"Overpass Mono",ui-monospace,Menlo,Consolas,monospace;
+
+  /* Form */
+  --r:3px;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;background:var(--ink);color:var(--text)}
+img,canvas{max-width:100%}
+body{font-family:var(--font-ui);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+.gx{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.lbl{font:700 11px/1 var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);margin:0}
+.dim{color:var(--text-2)}
+h1,h2,h3{text-wrap:balance;margin:0}
+.booterr{position:fixed;left:16px;right:16px;bottom:16px;z-index:99;background:#2a0d12;border:1px solid var(--bad);color:var(--text);border-radius:var(--r);padding:12px 16px;font:13px/1.5 var(--font-mono);white-space:pre-wrap}
+
+/* Knapper */
+.btn{min-height:38px;padding:0 14px;border-radius:var(--r);border:1px solid var(--line-strong);background:transparent;color:var(--text);font-weight:700;font-size:13px;letter-spacing:.02em;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;transition:background .15s,border-color .15s,transform .1s;text-decoration:none}
+.btn:hover:not(:disabled){background:var(--surface-2);border-color:var(--text-3)}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary{background:var(--yellow);border-color:var(--yellow);color:var(--yellow-ink);font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.btn.primary:hover:not(:disabled){background:#FFD84A;border-color:#FFD84A}
+.btn.quiet{border-color:transparent;color:var(--text-2)}
+.btn.quiet:hover:not(:disabled){color:var(--text)}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+.btn.sm{min-height:28px;padding:0 10px;font-size:12px}
+.btn .k{font:500 11px var(--font-mono);opacity:.65;letter-spacing:0;text-transform:none}
+@media (pointer:coarse){.btn{min-height:44px}.btn.sm{min-height:36px}}
+
+/* Status: firkantet markør + versaler, ingen piller */
+.st{display:inline-flex;align-items:center;gap:7px;font:700 11px/1 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);white-space:nowrap}
+.st::before{content:"";width:8px;height:8px;background:currentColor;flex:0 0 auto}
+.st[data-s="run"],.st[data-s="i-gang"]{color:var(--ok)}
+.st[data-s="ok"],.st[data-s="faerdig"]{color:var(--yellow)}
+.st[data-s="bad"]{color:var(--bad)}
+.st[data-s="fast"]{color:var(--warn)}
+.st[data-s="inaktiv"]{color:var(--text-3)}
+
+/* Felter */
+.field{display:flex;flex-direction:column;gap:8px}
+.input{min-height:48px;padding:0 14px;border-radius:var(--r);border:1px solid var(--line-strong);background:var(--ink);font-size:18px;font-weight:600;outline:0;width:100%}
+.input:focus{border-color:var(--yellow)}
+.mono{font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.06em}
+.err{color:var(--bad);font-size:13px;margin:0}
+.warnline{color:var(--warn);font-size:13px;margin:0}
+
+/* Indgangsanimation: én gang, kort */
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.rise{animation:rise .45s cubic-bezier(.2,.8,.2,1) backwards}
+.d1{animation-delay:.06s}.d2{animation-delay:.12s}.d3{animation-delay:.18s}.d4{animation-delay:.24s}
+
+/* ================= PAUSE ================= */
+.pause{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:var(--sign);padding:24px}
+.pause::after{content:"";position:absolute;inset:18px;border:4px solid #fff;border-radius:14px;pointer-events:none}
+.pause-in{text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px}
+.pause .ring{width:clamp(80px,10vw,140px);height:auto}
+.pause h1{font-weight:900;font-size:clamp(72px,14vw,220px);line-height:.85;letter-spacing:-.04em;color:#fff}
+.pause p{margin:0;font:900 clamp(28px,5vw,72px)/1 var(--font-ui);letter-spacing:.02em;color:var(--yellow);text-transform:uppercase;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.pausebtn.on{background:var(--warn);border-color:var(--warn);color:var(--yellow-ink)}
+
+/* ================= LOGIN ================= */
+.login{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);min-height:100vh;min-height:100dvh}
+.sign{background:var(--sign);position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(28px,5vw,64px);overflow:hidden}
+.sign::after{content:"";position:absolute;inset:14px;border:3px solid rgba(255,255,255,.92);border-radius:10px;pointer-events:none}
+.sign .ring{width:clamp(72px,9vw,120px);height:auto}
+.sign h1{font-weight:900;font-size:clamp(56px,9vw,132px);line-height:.86;letter-spacing:-.035em;color:#fff}
+.sign h1 b{color:var(--yellow);font-weight:900}
+.route{font:700 clamp(11px,1vw,13px)/1.9 var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.78);max-width:44ch;margin:24px 0 0}
+.route span{color:var(--yellow)}
+.by{font:600 14px var(--font-ui);color:rgba(255,255,255,.9);margin:0;position:relative;z-index:1}
+.loginform{display:flex;align-items:center;justify-content:center;padding:48px max(24px,env(safe-area-inset-right,0px)) 48px 24px;background:var(--surface)}
+.loginform form{width:100%;max-width:380px;display:flex;flex-direction:column;gap:20px}
+.loginform h2{font-weight:900;font-size:32px;line-height:1;letter-spacing:-.02em}
+.loginform .alt{display:flex;gap:4px;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--line)}
+@media (max-width:820px){.login{grid-template-columns:1fr}.sign{min-height:46vh}}
+
+/* ================= APP-SKAL ================= */
+.app{display:flex;flex-direction:column;min-height:100vh}
+.nav{display:flex;align-items:stretch;gap:24px;height:52px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:18px;letter-spacing:-.01em;white-space:nowrap}
+.brand .ring{width:26px;height:26px}
+.brand b{color:var(--yellow)}
+.tabs{display:flex}
+.tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:2px 14px 0;color:var(--text-2);font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.tabs button:hover{color:var(--text)}
+.tabs button[aria-selected="true"]{color:var(--text);border-bottom-color:var(--yellow)}
+.me{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:14px;white-space:nowrap}
+.me b{font-weight:800}
+.me .pts{font:700 14px var(--font-mono);color:var(--yellow);font-variant-numeric:tabular-nums}
+.views{flex:1;min-height:0;display:flex;flex-direction:column}
+.view{flex:1;min-height:0;display:flex;flex-direction:column}
+
+.pane{background:var(--surface);min-width:0;min-height:0;display:flex;flex-direction:column}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:40px;padding:0 16px;border-bottom:1px solid var(--line);flex:0 0 auto}
+.ph .row{display:flex;align-items:center;gap:12px}
+
+/* ================= SPIL ================= */
+.levels{display:flex;background:var(--surface);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;flex:0 0 auto}
+.levels::-webkit-scrollbar{display:none}
+.lv{flex:1 0 auto;display:flex;align-items:center;gap:9px;height:44px;padding:0 14px;border:0;border-right:1px solid var(--line);background:none;color:var(--text-2);font-weight:700;font-size:13px;white-space:nowrap}
+.lv:last-child{border-right:0}
+.lv .n{width:22px;height:22px;display:grid;place-items:center;font:700 12px/1 var(--font-mono);border:1.5px solid var(--text-3);border-radius:2px;color:var(--text-2);padding-top:1px}
+.lv .p{font:600 11px var(--font-mono);color:var(--ok);font-variant-numeric:tabular-nums}
+.lv:hover:not(:disabled){color:var(--text);background:var(--surface-2)}
+.lv.done .n{border-color:var(--ok);color:var(--ok)}
+.lv[aria-current="true"]{color:var(--text);background:var(--ink);box-shadow:inset 0 -2px var(--yellow)}
+.lv[aria-current="true"] .n{background:var(--yellow);border-color:var(--yellow);color:var(--yellow-ink)}
+.lv:disabled{opacity:.42;cursor:not-allowed}
+.lv:disabled .n{border-style:dashed}
+
+.game{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(380px,1fr);grid-template-rows:minmax(0,1fr) 150px;gap:1px;background:var(--line)}
+.p-map{grid-column:1;grid-row:1}
+.p-log{grid-column:1;grid-row:2}
+.side{grid-column:2;grid-row:1/3;display:flex;flex-direction:column;gap:1px;background:var(--line);min-height:0;min-width:0}
+.p-ticket{flex:0 1 auto;max-height:60%;overflow:auto}
+.p-editor{flex:1 1 0;min-height:200px}
+.ph h2{font-weight:800;font-size:15px;letter-spacing:-.005em}
+.ph h2 .arr{color:var(--yellow);margin:0 .3em}
+.mapbox{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:20px;background-color:var(--ink);background-image:radial-gradient(var(--line) 1px,transparent 1.2px);background-size:22px 22px}
+.mapbox canvas{display:block;max-width:100%;box-shadow:0 0 0 1px var(--line-strong)}
+.shake{animation:shake .42s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
+.win{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(16,42,110,.7);padding:16px}
+.win-card{background:var(--surface);border:1px solid var(--line-strong);border-top:4px solid var(--yellow);border-radius:var(--r);padding:20px 24px 22px;min-width:min(320px,100%);display:flex;flex-direction:column;gap:6px}
+.win-card .score{font-weight:900;font-size:64px;line-height:.95;letter-spacing:-.03em;color:var(--yellow);font-variant-numeric:tabular-nums;margin:4px 0 0}
+.win-card .score small{font-size:18px;font-weight:700;letter-spacing:0;color:var(--text-2);margin-left:6px}
+.win-card p{margin:0}
+.win-card .row{display:flex;gap:8px;margin-top:14px}
+
+.ticket{padding:18px 20px 20px;display:flex;flex-direction:column;gap:14px}
+.ticket .of{display:flex;gap:10px;flex-wrap:wrap}
+.ticket h2{font-weight:900;font-size:30px;line-height:1;letter-spacing:-.025em;margin-top:-4px}
+.ticket .story{margin:0;color:var(--text-2);font-size:14px;max-width:62ch}
+.tool{display:flex;flex-direction:column;gap:8px}
+.explain{display:flex;flex-direction:column;gap:8px}
+.explain ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:14px;color:var(--text)}
+.explain li::marker{color:var(--yellow)}
+.explain code{font:13px var(--font-mono);color:var(--code-fn);background:var(--code-bg);padding:1px 5px;border-radius:2px;white-space:nowrap}
+.codeblock{margin:0;background:var(--code-bg);border-left:2px solid var(--yellow);padding:10px 14px;font:13px/1.6 var(--font-mono);white-space:pre;overflow-x:auto}
+.cur{width:100%;border-collapse:collapse;font:12px var(--font-mono);font-variant-numeric:tabular-nums}
+.cur td{padding:3px 0;border-top:1px solid var(--line)}
+.cur td:first-child{color:var(--text-2)}
+.cur td:last-child{color:var(--yellow);text-align:right}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{min-height:30px;border:1px solid var(--line-strong);background:var(--ink);border-radius:2px;padding:0 10px;font:13px var(--font-mono);color:var(--code-fn)}
+.chip:hover{border-color:var(--code-fn)}
+.note{margin:0;font-size:12.5px;color:var(--text-3)}
+.hintbox{border:1px dashed var(--yellow);padding:10px 14px}
+.hintbox pre{margin:6px 0 0;font:13px/1.6 var(--font-mono);white-space:pre;overflow-x:auto}
+
+.file{font:700 12px var(--font-mono);letter-spacing:.04em}
+.linecount{font:12px var(--font-mono);color:var(--text-3);font-variant-numeric:tabular-nums}
+.linecount b{color:var(--text)}
+.linecount b.over{color:var(--code-num)}
+.code{flex:1;min-height:0;display:grid;grid-template-columns:auto minmax(0,1fr);background:var(--code-bg)}
+.gut,.hl,.code textarea{font:14px/1.65 var(--font-mono);tab-size:2;letter-spacing:0}
+.gut{margin:0;padding:12px 8px 12px 14px;text-align:right;color:var(--code-gutter);overflow:hidden;user-select:none;min-width:2.6em}
+.area{position:relative;min-width:0}
+.hl{position:absolute;inset:0;margin:0;padding:12px 14px;overflow:hidden;white-space:pre;pointer-events:none;color:var(--text)}
+.code textarea{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:12px 14px;border:0;outline:0;resize:none;background:transparent;color:transparent;caret-color:var(--yellow);white-space:pre;overflow:auto}
+.code textarea::selection{background:rgba(255,204,0,.28);color:transparent}
+.t-k{color:var(--code-kw)}.t-f{color:var(--code-fn)}.t-s{color:var(--code-str)}.t-n{color:var(--code-num)}.t-c{color:var(--code-com);font-style:italic}
+.controls{display:flex;flex-wrap:wrap;gap:8px;padding:10px 16px;border-top:1px solid var(--line);flex:0 0 auto}
+.controls .sp{flex:1}
+
+.log{flex:1;min-height:0;margin:0;padding:10px 16px;list-style:none;font:13px/1.55 var(--font-mono);overflow:auto;display:flex;flex-direction:column;gap:2px}
+.log li{overflow-wrap:anywhere}
+.log .info{color:var(--text-3)}.log .ok{color:var(--ok)}.log .bad{color:var(--bad)}.log .warn{color:var(--warn)}.log .user{color:var(--code-fn)}
+
+/* ================= SCOREBOARD ================= */
+.board{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,380px);grid-template-rows:auto minmax(0,1fr);gap:1px;background:var(--line)}
+.sb-head{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 32px;padding:24px 28px 22px;background:var(--surface)}
+.sb-head h1{font-weight:900;font-size:clamp(40px,5.4vw,76px);line-height:.85;letter-spacing:-.035em}
+.sb-head p{margin:10px 0 0}
+.join{display:flex;align-items:flex-end;gap:28px}
+.join .jcode{font:700 clamp(32px,4vw,56px)/.9 var(--font-mono);color:var(--yellow);letter-spacing:.04em;display:block;margin-top:8px;background:none;min-height:0}
+.join .url{font:700 clamp(16px,1.6vw,22px) var(--font-mono);color:var(--yellow);max-width:34ch;overflow-wrap:anywhere;margin-top:8px}
+.rankbox{background:var(--surface);min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.rank{list-style:none;margin:0;padding:0}
+.rrow{display:grid;grid-template-columns:72px minmax(0,1fr) 170px 120px;align-items:center;height:60px;padding:0 28px;border-bottom:1px solid var(--line)}
+.rrow .rk{font:900 26px var(--font-ui);color:var(--text-3);font-variant-numeric:tabular-nums}
+.rrow .nm{font-weight:800;font-size:clamp(18px,1.9vw,26px);letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.rrow .nm small{font:600 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-left:10px}
+.prog{display:flex;gap:4px}
+.prog i{width:12px;height:16px;background:var(--line)}
+.prog i.on{background:var(--yellow)}
+.rrow .pts{text-align:right;font-weight:900;font-size:clamp(22px,2.3vw,32px);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.rrow.lead .rk{color:var(--yellow-ink);background:var(--yellow);width:40px;height:40px;display:grid;place-items:center;padding-top:3px}
+.rrow.lead .nm{color:#fff}
+.rrow.flash .pts{animation:flash 1.4s ease-out}
+@keyframes flash{0%{color:var(--yellow);transform:scale(1.2)}100%{color:var(--text);transform:none}}
+.more{margin:0;padding:12px 28px;color:var(--text-3);font:600 12px var(--font-mono);letter-spacing:.08em;text-transform:uppercase}
+.empty{padding:48px 28px;color:var(--text-2);max-width:50ch}
+.empty h3{font-weight:900;font-size:22px;color:var(--text);margin-bottom:6px}
+.feed{background:var(--surface);min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.feed ul{list-style:none;margin:0;padding:0 20px;overflow:hidden}
+.feed li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.feed .what{font-size:14px;color:var(--text-2)}
+.feed .what b{color:var(--text);font-weight:800}
+.feed .gain{font:700 14px var(--font-mono);color:var(--yellow);font-variant-numeric:tabular-nums}
+.feed .when{grid-column:1/-1;font:11px var(--font-mono);color:var(--text-3)}
+@media (max-width:700px){.rrow{grid-template-columns:44px minmax(0,1fr) 80px;padding:0 16px}.rrow .prog{display:none}.sb-head{padding:20px 16px}}
+
+/* ================= PANEL ================= */
+.gate{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 16px;background:var(--surface)}
+.gate form{width:100%;max-width:360px;display:flex;flex-direction:column;gap:18px}
+.gate h1{font-weight:900;font-size:32px;line-height:1;letter-spacing:-.02em}
+.gate p{margin:0}
+.panel{flex:1;min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:1px;background:var(--line)}
+.phead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding:20px 24px;background:var(--surface)}
+.phead h1{font-weight:900;font-size:36px;line-height:.9;letter-spacing:-.03em}
+.phead p{margin:8px 0 0;max-width:72ch;font-size:13px}
+.stats{display:flex;flex-wrap:wrap;gap:1px;background:var(--line)}
+.stat{flex:1 1 140px;padding:14px 24px;background:var(--surface)}
+.stat b{display:block;font-weight:900;font-size:34px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stat b.warn{color:var(--warn)}
+.stat span{display:block;margin-top:6px}
+.tablepane{background:var(--surface);min-height:0;overflow:auto}
+.ptable{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.ptable th{position:sticky;top:0;background:var(--surface);text-align:left;font:700 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);padding:12px 16px;border-bottom:1px solid var(--line-strong);white-space:nowrap;z-index:1}
+.ptable td{padding:11px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+.ptable td:first-child,.ptable th:first-child{padding-left:24px}
+.ptable .nm{font-weight:800}
+.ptable td.num{font-family:var(--font-mono);font-size:13px}
+.ptable tr.fast td:first-child{box-shadow:inset 3px 0 var(--warn)}
+.settings{display:flex;flex-wrap:wrap;gap:1px;background:var(--line)}
+.setrow{flex:1 1 300px;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 24px;background:var(--surface);flex-wrap:wrap}
+.setrow .txt{display:flex;flex-direction:column;gap:4px;min-width:0;max-width:46ch}
+.setrow .txt b{font-weight:800;font-size:14px}
+.setrow .txt span{font-size:12.5px;color:var(--text-2)}
+.setrow .input{min-height:34px;width:120px;font-size:14px}
+.setrow form{display:flex;gap:8px;align-items:center}
+
+/* ================= ÉN SKÆRM (desktop) ================= */
+@media (min-width:1000px) and (min-height:600px){
+  html,body{height:100%;overflow:hidden}
+  .app{height:100%;min-height:0}
+}
+/* Mindre skærme: almindelig rulning, panelerne stables */
+@media (max-width:999px),(max-height:599px){
+  .game{display:flex;flex-direction:column;gap:1px}
+  .side{display:contents}
+  .p-ticket{order:1;max-height:none}
+  .p-map{order:2;min-height:300px}
+  .p-ticket,.p-map,.p-editor,.p-log{flex:none}
+  .p-editor{order:3;min-height:0}
+  .p-editor .code{height:280px;flex:none}
+  .p-log{order:4;min-height:160px}
+  .board{display:flex;flex-direction:column}
+  .rankbox,.feed{overflow:visible}
+  .panel{display:flex;flex-direction:column}
+  .tablepane{overflow-x:auto}
+  .nav{gap:12px;height:auto;min-height:52px;flex-wrap:wrap}
+  .brand{min-height:52px}
+}
+@media (max-width:640px){.tabs{order:3;width:100%;border-top:1px solid var(--line)}.tabs button{flex:1;min-height:44px}.me{min-height:52px}}
+@media (prefers-reduced-motion:reduce){.rise,.shake,.rrow.flash .pts,.pause p{animation:none}*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="booterr" id="bootErr" hidden></div>
+<script>
+window.addEventListener("error",function(e){var b=document.getElementById("bootErr");if(!b)return;b.hidden=false;b.textContent="ROUTE//EU kunne ikke starte:\n"+(e.message||e)+(e.lineno?"  (linje "+e.lineno+")":"")+"\nTjek især CONFIG øverst i scriptet (manglende komma eller anførselstegn).";});
+window.addEventListener("unhandledrejection",function(e){var b=document.getElementById("bootErr");if(!b)return;b.hidden=false;b.textContent="ROUTE//EU fejl: "+((e.reason&&e.reason.message)||e.reason);});
+</script>
+
+<div class="pause" id="pause" hidden role="alertdialog" aria-live="assertive" aria-label="Pause">
+  <div class="pause-in"><svg class="ring" viewBox="0 0 44 44" aria-hidden="true"></svg><h1>PAUSE</h1><p>Kig op</p></div>
+</div>
+
+<!-- ================= LOGIN ================= -->
+<div class="login" id="login" hidden>
+  <section class="sign" aria-hidden="true">
+    <svg class="ring rise" viewBox="0 0 44 44"></svg>
+    <div class="rise d1">
+      <h1>ROUTE<b>//</b><br>EU</h1>
+      <p class="route">København <span>→</span> Hamborg <span>→</span> Amsterdam <span>→</span> Bruxelles <span>→</span> Brenner <span>→</span> Paris <span>→</span> Malmö <span>→</span> Trollstigen</p>
+    </div>
+    <p class="by rise d2">Programmering · Aalborg Universitet</p>
+  </section>
+  <section class="loginform">
+    <form id="loginForm" novalidate action="javascript:void 0" class="rise d2">
+      <div>
+        <p class="lbl">8 baner · ca. 60 minutter · ingen erfaring nødvendig</p>
+        <h2 style="margin-top:10px">Skriv kode, der kører lastbilen gennem Europa.</h2>
+      </div>
+      <div class="field">
+        <label class="lbl" for="nameIn">Navn</label>
+        <input class="input" id="nameIn" maxlength="20" autocomplete="off" autocapitalize="words">
+      </div>
+      <p class="err" id="loginErr" hidden></p>
+      <p class="warnline" id="loginWarn" hidden></p>
+      <button class="btn primary" id="loginBtn" type="submit" style="min-height:52px;font-size:15px">Start</button>
+      <p class="dim" style="margin:-6px 0 0;font-size:13px">Dit navn vises på scoreboardet. Brug dit fornavn.</p>
+      <div class="alt">
+        <a class="btn quiet sm" href="#scoreboard">Scoreboard</a>
+        <a class="btn quiet sm" href="#panel">Underviser-panel</a>
+      </div>
+    </form>
+  </section>
+</div>
+
+<!-- ================= APP ================= -->
+<div class="app" id="app" hidden>
+  <header class="nav gx">
+    <div class="brand"><svg class="ring" viewBox="0 0 44 44" aria-hidden="true"></svg><span>ROUTE<b>//</b>EU</span></div>
+    <div class="tabs" role="tablist" aria-label="Visning">
+      <button role="tab" id="tab-spil" data-route="spil">Spil</button>
+      <button role="tab" id="tab-scoreboard" data-route="scoreboard">Scoreboard</button>
+      <button role="tab" id="tab-panel" data-route="panel">Panel</button>
+    </div>
+    <div class="me" id="me"></div>
+  </header>
+
+  <div class="views">
+    <!-- SPIL -->
+    <section class="view" id="view-spil" hidden>
+      <nav class="levels" id="levels" aria-label="Baner"></nav>
+      <div class="game">
+        <section class="pane p-map rise" aria-label="Kort">
+          <div class="ph">
+            <div class="row"><h2 id="mapTitle">Kort</h2><span class="st" id="cargo" hidden></span></div>
+            <div class="row"><span class="st" id="status" data-s="idle">Klar</span><button class="btn sm" id="speed" aria-label="Skift hastighed">1×</button></div>
+          </div>
+          <div class="mapbox" id="mapbox">
+            <canvas id="cv" role="img" aria-label="Kort over ruten med lastbilen"></canvas>
+            <div class="win" id="win" hidden>
+              <div class="win-card">
+                <p class="lbl" style="color:var(--ok)">Leveret</p>
+                <p class="score" id="winScore">100<small>point</small></p>
+                <p class="dim" id="winDetail" style="font-size:14px"></p>
+                <div class="row">
+                  <button class="btn primary" id="nextBtn">Næste bane</button>
+                  <button class="btn" id="againBtn">Prøv igen</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="pane p-log rise d2" aria-label="Log">
+          <div class="ph"><p class="lbl">Log</p><button class="btn quiet sm" id="clear">Ryd</button></div>
+          <ul class="log" id="log" aria-live="polite"></ul>
+        </section>
+
+        <div class="side">
+          <section class="pane p-ticket rise d1" id="ticket" aria-live="polite"></section>
+          <section class="pane p-editor rise d2" aria-label="Kode-editor">
+            <div class="ph"><span class="file">rute.js</span><span class="linecount" id="lc"></span></div>
+            <div class="code">
+              <pre class="gut" id="gut" aria-hidden="true">1</pre>
+              <div class="area">
+                <pre class="hl" id="hl" aria-hidden="true"></pre>
+                <textarea id="code" aria-label="Kode" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off"></textarea>
+              </div>
+            </div>
+            <div class="controls">
+              <button class="btn primary" id="run">Kør <span class="k">Ctrl+Enter</span></button>
+              <button class="btn" id="reset">Nulstil</button>
+              <button class="btn" id="hintBtn">Hint <span class="k">−30</span></button>
+              <button class="btn" id="skipBtn" hidden>Spring over <span class="k">0 p</span></button>
+              <span class="sp"></span>
+              <button class="btn quiet" id="restore">Start forfra</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCOREBOARD -->
+    <section class="view" id="view-scoreboard" hidden>
+      <div class="board">
+        <div class="sb-head">
+          <div>
+            <h1>Scoreboard</h1>
+            <p class="dim" id="sbSub"></p>
+          </div>
+          <div class="join">
+            <div><p class="lbl">Gå ind på</p><div class="url" id="sbUrl"></div></div>
+          </div>
+        </div>
+        <div class="rankbox" id="rankBox">
+          <ol class="rank" id="rank"></ol>
+          <p class="more" id="more" hidden></p>
+          <div class="empty" id="rankEmpty" hidden><h3>Ingen spillere endnu</h3>Når eleverne logger ind, dukker de op her.</div>
+        </div>
+        <aside class="feed" aria-label="Seneste begivenheder">
+          <div class="ph"><p class="lbl">Lige nu</p></div>
+          <ul id="feed"></ul>
+          <p class="dim" id="feedEmpty" style="margin:0;padding:16px 20px;font-size:14px">Her kommer point, så snart nogen klarer en bane.</p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- PANEL -->
+    <section class="view" id="view-panel" hidden>
+      <div class="gate" id="gate">
+        <form id="pinForm" novalidate action="javascript:void 0">
+          <div>
+            <p class="lbl">Kun for studieambassadører</p>
+            <h1 style="margin-top:10px">Underviser-panel</h1>
+          </div>
+          <p class="dim" style="font-size:14px">Se hvem der er i gang, hvem der sidder fast, sæt pause og ryd runden efter en klasse.</p>
+          <div class="field">
+            <label class="lbl" for="pinIn">PIN-kode</label>
+            <input class="input" id="pinIn" type="password" autocomplete="off">
+          </div>
+          <p class="err" id="pinErr" hidden>Forkert PIN-kode. Prøv igen.</p>
+          <button class="btn primary" type="submit" id="pinBtn" style="min-height:48px">Lås op</button>
+        </form>
+      </div>
+      <div class="panel" id="panelBody" hidden>
+        <div class="phead">
+          <div>
+            <h1>Panel</h1>
+            <p class="dim" id="modeLine"></p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn primary pausebtn" id="pauseBtn" style="min-height:48px;padding:0 22px">Sæt pause</button><button class="btn sm" id="lockBtn">Lås panelet</button></div>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="tablepane">
+          <table class="ptable">
+            <thead><tr><th>Navn</th><th>Bane</th><th>Løst</th><th>Point</th><th>Forsøg</th><th>Tid på banen</th><th>Sidst aktiv</th><th>Status</th><th><span style="position:absolute;left:-9999px">Handling</span></th></tr></thead>
+            <tbody id="ptbody"></tbody>
+          </table>
+          <div class="empty" id="ptEmpty" hidden><h3>Ingen spillere endnu</h3>Når eleverne logger ind, står de her. Dem der sidder fast, kommer øverst.</div>
+        </div>
+        <div class="settings">
+          <div class="setrow">
+            <div class="txt"><b>Link til eleverne</b><span id="linkTxt" style="font-family:var(--font-mono);overflow-wrap:anywhere"></span></div>
+            <button class="btn sm" id="copyLink">Kopiér link</button>
+          </div>
+          <div class="setrow">
+            <div class="txt"><b>Ryd runden</b><span id="clearMsg">Sletter alle spillere og point. Gør det, før en ny klasse starter.</span></div>
+            <button class="btn sm danger" id="clearRound">Ryd runden</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   SIMULATOR — kører i en Web Worker, så uendelige løkker ikke fryser siden.
+   Skal være selvstændig (ingen referencer udenfor funktionen).
+   ===================================================================== */
+function simulate(level, code){
+  var D=[[0,-1],[1,0],[0,1],[-1,0]];
+  var x=level.start.x, y=level.start.y, d=level.start.dir;
+  var paid={}, actions=[], sensors=0, dead=null, data=!!level.data, reported=false;
+  var WALL=[
+    "Lastbilen kørte ud i en roemark. Landmanden er ikke imponeret.",
+    "Bang. Det var en mur. Forsikringen ringer i morgen.",
+    "Lastbilen prøvede at køre igennem et hus. Huset vandt.",
+    "Det var ikke en vej. Det var en sø. GPS'en er skuffet."
+  ];
+  function inside(cx,cy){return cx>=0&&cy>=0&&cx<level.w&&cy<level.h;}
+  function cell(cx,cy){return inside(cx,cy)?level.cells[cy][cx]:null;}
+  function road(cx,cy){var c=cell(cx,cy);return !!c&&c!=="#";}
+  function landAt(cx,cy){return inside(cx,cy)?level.land[cy][cx]:null;}
+  function ahead(){return [x+D[d][0], y+D[d][1]];}
+  function key(cx,cy){return cx+","+cy;}
+  function nm(l){return level.names[l]||l;}
+  function stopErr(){var e=new Error("STOP");e.__stop=true;return e;}
+  function halt(status,msg){dead={status:status,msg:msg};throw stopErr();}
+  function guard(){if(dead)throw stopErr();}
+  function act(){guard();if(actions.length>=400)halt("crash","Lastbilen kørte 400 skridt uden at nå frem og løb tør for diesel. Kører den i ring?");}
+  function sense(){guard();if(++sensors>20000)halt("crash",actions.length?"Koden spurgte 20.000 gange uden at flytte lastbilen. Der er sikkert en uendelig løkke.":"Løkken kører, men lastbilen gør ingenting. Skriv frem(); inde mellem { og }.");}
+  function atGoal(){return x===level.goal.x&&y===level.goal.y;}
+  function frem(){
+    act();var a=ahead(),c=cell(a[0],a[1]);
+    if(!c||c==="#"){actions.push({t:"crash",x:a[0],y:a[1]});halt("crash",WALL[Math.floor(Math.random()*WALL.length)]);}
+    if(c==="B"&&!paid[key(a[0],a[1])]){actions.push({t:"crash",x:a[0],y:a[1]});halt("crash","Bommen var lukket. Du skal betale, før du kører igennem.");}
+    var l=landAt(a[0],a[1]);
+    if(level.gdpr&&data&&l&&!level.eu[l]){actions.push({t:"crash",x:a[0],y:a[1]});halt("crash","GDPR-bøde! Du kørte persondata ud af EU til "+nm(l)+". Aflever dem, før du krydser grænsen.");}
+    x=a[0];y=a[1];actions.push({t:"move",x:x,y:y});
+  }
+  function venstre(){act();d=(d+3)%4;actions.push({t:"turn",r:-1});}
+  function hojre(){act();d=(d+1)%4;actions.push({t:"turn",r:1});}
+  function vaeg(){sense();var a=ahead();return !road(a[0],a[1]);}
+  function vejH(){sense();var r=(d+1)%4;return road(x+D[r][0],y+D[r][1]);}
+  function vejV(){sense();var r=(d+3)%4;return road(x+D[r][0],y+D[r][1]);}
+  function maal(){sense();return atGoal();}
+  function land(){sense();var a=ahead();return landAt(a[0],a[1]);}
+  function bom(){sense();var a=ahead();return cell(a[0],a[1])==="B"&&!paid[key(a[0],a[1])];}
+  function pakke(){sense();return cell(x,y)==="P";}
+  function persondata(){sense();return data;}
+  function iEU(){sense();var a=ahead(),l=landAt(a[0],a[1]);return l?!!level.eu[l]:false;}
+  function betal(v){
+    act();var a=ahead();
+    if(cell(a[0],a[1])!=="B"||paid[key(a[0],a[1])])halt("crash","Du betalte, men der var ingen lukket bom foran dig. Pengene er væk.");
+    var l=landAt(a[0],a[1]),need=level.currency[l],given=String(v).trim().toUpperCase();
+    if(given!==need){actions.push({t:"crash",x:a[0],y:a[1]});halt("crash","Forkert valuta. I "+nm(l)+" betaler man med "+need+", ikke "+v+".");}
+    paid[key(a[0],a[1])]=true;actions.push({t:"pay",x:a[0],y:a[1],v:need,l:nm(l)});
+  }
+  function rapport(n){
+    act();
+    if(!atGoal())halt("crash","Du sendte rapporten, før lastbilen var i mål. Kør først helt frem.");
+    if(Number(n)!==level.packages)halt("crash","Forkert optælling. Der lå "+level.packages+" pakker på vejen, men du rapporterede "+n+".");
+    reported=true;actions.push({t:"report",n:Number(n)});
+  }
+  function aflever(){
+    act();var a=ahead(),l=landAt(a[0],a[1]);
+    if(!data)halt("crash","Du har ingen persondata at aflevere.");
+    if(!l||level.eu[l])halt("crash","Ingen grund til at aflevere her: "+nm(l)+" er i EU, så persondata må gerne køre med.");
+    data=false;actions.push({t:"drop",l:nm(l)});
+  }
+  function log(){guard();actions.push({t:"log",msg:Array.prototype.map.call(arguments,String).join(" ")});}
+  function translate(e){
+    var m=String(e&&e.message||e);
+    if(e&&e.name==="SyntaxError")return "Koden kan ikke læses. Tjek at alle ( ) og { } passer sammen. ("+m+")";
+    var r=/^(.+?) is not defined/.exec(m)||/Can't find variable: (.+)/.exec(m);
+    if(r)return "\""+r[1]+"\" findes ikke. Stavefejl? Kommandoerne står i banens beskrivelse.";
+    var f=/(.+?) is not a function/.exec(m);
+    if(f)return "\""+f[1]+"\" er ikke en kommando.";
+    return "Fejl i koden: "+m;
+  }
+  var names=["frem","venstre","højre","hojre","vægForan","vaegForan","vejTilHøjre","vejTilHojre","vejTilVenstre","iMål","iMaal","land","bomForan","betal","pakkeHer","rapport","persondata","iEU","aflever","log"];
+  var fns=[frem,venstre,hojre,hojre,vaeg,vaeg,vejH,vejH,vejV,maal,maal,land,bom,betal,pakke,rapport,persondata,iEU,aflever,log];
+  var fn;
+  try{fn=Function.apply(null,names.concat([code]));}
+  catch(e){return {status:"error",msg:translate(e),actions:[]};}
+  try{fn.apply(null,fns);}
+  catch(e){if(!(e&&e.__stop)&&!dead)return {status:"error",msg:translate(e),actions:actions};}
+  if(dead)return {status:dead.status,msg:dead.msg,actions:actions};
+  if(atGoal()){
+    if(level.needReport&&!reported)return {status:"stopped",msg:"Lastbilen er i mål, men chefen venter på rapporten. Kald rapport(antal) til sidst.",actions:actions};
+    return {status:"goal",actions:actions};
+  }
+  var moved=actions.some(function(q){return q.t==="move";});
+  if(!moved)return {status:"stopped",msg:"Lastbilen flyttede sig ikke. Har du skrevet frem(); – og står den inde i { } i løkken?",actions:actions};
+  return {status:"stopped",msg:"Koden er færdig, men lastbilen er ikke i mål endnu. Skal der en løkke til, eller mangler der et sving?",actions:actions};
+}
+
+(function(){
+"use strict";
+
+/* =====================================================================
+   OPSÆTNING
+   Tom SUPABASE_URL = lokal tilstand (deler kun data mellem faner i samme browser).
+   I live-tilstand tjekkes PIN-koden i databasen (tabellen admin_secret), ikke her.
+   ===================================================================== */
+const CONFIG={
+  SUPABASE_URL:"",        // fx "https://abcdefgh.supabase.co"
+  SUPABASE_ANON_KEY:"",   // "anon public"-nøglen fra Supabase → Project settings → API
+  ADMIN_PIN:"2026",       // bruges KUN uden Supabase
+  ROUND:"AAU"             // intern rundekode; behøver ikke ændres
+};
+const VERSION="v0.5";
+
+const $=s=>document.querySelector(s);
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const now=()=>Date.now();
+const iso=t=>new Date(t).toISOString();
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const mkStore=st=>({get(k,d){try{const v=st().getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{st().setItem(k,JSON.stringify(v));}catch(e){}},del(k){try{st().removeItem(k);}catch(e){}}});
+const LS=mkStore(()=>localStorage),SS=mkStore(()=>sessionStorage);
+const uuid=()=>{try{return crypto.randomUUID();}catch(e){return "xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx".replace(/x/g,()=>(Math.random()*16|0).toString(16));}};
+const cssVar=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const isLive=()=>!!(CONFIG.SUPABASE_URL&&CONFIG.SUPABASE_ANON_KEY);
+
+/* ---------- Lande ---------- [navn, valuta, i EU, farvetone-forskydning] */
+const COUNTRIES={
+  DK:["Danmark","DKK",1,0],  DE:["Tyskland","EUR",1,-10], NL:["Holland","EUR",1,10],  BE:["Belgien","EUR",1,-18],
+  FR:["Frankrig","EUR",1,4], AT:["Østrig","EUR",1,16],    IT:["Italien","EUR",1,-22], PL:["Polen","PLN",1,6],
+  CZ:["Tjekkiet","CZK",1,-14],SE:["Sverige","SEK",1,-4],  HU:["Ungarn","HUF",1,20],
+  NO:["Norge","NOK",0,-28],  RS:["Serbien","RSD",0,30],   TR:["Tyrkiet","TRY",0,-32], AL:["Albanien","ALL",0,26]
+};
+const CUR={},NAMES={},EU={};
+for(const k in COUNTRIES){NAMES[k]=COUNTRIES[k][0];CUR[k]=COUNTRIES[k][1];EU[k]=!!COUNTRIES[k][2];}
+
+/* ---------- Banebyggere ---------- */
+function build(rows,landFn,dir,cities,extra){
+  const h=rows.length,w=rows[0].length,cells=[],land=[];let start,goal,packages=0;
+  for(let y=0;y<h;y++){cells[y]=[];land[y]=[];
+    for(let x=0;x<w;x++){let ch=rows[y][x];
+      if(ch==="S"){start={x,y,dir};ch=".";}
+      if(ch==="G"){goal={x,y};ch=".";}
+      if(ch==="P")packages++;
+      cells[y][x]=ch;land[y][x]=landFn(x,y,w,h);}}
+  return Object.assign({w,h,cells,land,start,goal,currency:CUR,names:NAMES,eu:EU,cities,packages},extra||{});
+}
+const W14="#".repeat(14);
+const D4=[[0,-1],[1,0],[0,1],[-1,0]];
+function L1(){return build(["##########","#S...#####","####.#####","####...G##","##########"],x=>x<5?"DK":"DE",1,{start:"København",goal:"Hamborg"});}
+function L2(){return build([W14,W14,"#S..........G#",W14,W14],x=>x<7?"DE":"NL",1,{start:"Hamborg",goal:"Amsterdam"});}
+function L3(len){return build([W14,W14,"#S"+".".repeat(len-1)+"G"+"#".repeat(14-3-(len-1)),W14,W14],x=>x<6?"NL":"BE",1,{start:"Amsterdam",goal:"Bruxelles"});}
+function L4(a,b,c,d,e){
+  const g=Array.from({length:9},()=>Array(12).fill("#"));let x=1,y=7;g[y][x]="S";
+  [[0,a],[1,b],[2,c],[3,d],[0,e]].forEach(([dir,n])=>{for(let i=0;i<n;i++){x+=D4[dir][0];y+=D4[dir][1];g[y][x]=".";}});
+  g[y][x]="G";
+  return build(g.map(r=>r.join("")),(x,y)=>y<=4?"AT":"IT",0,{start:"Bolzano",goal:"Innsbruck"});
+}
+const SPIRALS=[[6,9,4,7,2],[5,7,3,5,1]];
+const POOL5=["DE","PL","CZ","SE","HU","AT"];
+function L5(t){return build([W14,W14,"#S.B..B..B..G#",W14,W14],x=>x<3?"DK":x<6?t[0]:x<9?t[1]:t[2],1,{start:"Kolding",goal:"Lageret"});}
+
+/* Snoet vej uden forgreninger: tilfældig vej på et grovt gitter */
+function lattice(cols,rows,minLen){
+  for(let tr=0;tr<1500;tr++){
+    let cx=rint(0,cols-1),cy=rint(0,rows-1),dir=-1;const path=[[cx,cy]],seen=new Set([cx+","+cy]);
+    for(;;){
+      const opts=[];for(let k=0;k<4;k++){const nx=cx+D4[k][0],ny=cy+D4[k][1];if(nx>=0&&ny>=0&&nx<cols&&ny<rows&&!seen.has(nx+","+ny))opts.push(k);}
+      if(!opts.length||path.length>=minLen+3)break;
+      const k=(dir>=0&&opts.includes(dir)&&Math.random()<.45)?dir:opts[Math.floor(Math.random()*opts.length)];
+      cx+=D4[k][0];cy+=D4[k][1];path.push([cx,cy]);seen.add(cx+","+cy);dir=k;
+    }
+    if(path.length<minLen)continue;
+    const ds=[];for(let i=0;i+1<path.length;i++)ds.push(D4.findIndex(q=>q[0]===path[i+1][0]-path[i][0]&&q[1]===path[i+1][1]-path[i][1]));
+    let L=0,R=0;for(let i=1;i<ds.length;i++){const t=(ds[i]-ds[i-1]+4)%4;if(t===1)R++;if(t===3)L++;}
+    if(L<1||R<1)continue;
+    return {path,ds};
+  }
+  throw new Error("lattice");
+}
+function snake(opts){
+  const cols=6,rows=4,{path,ds}=lattice(cols,rows,opts.minLen),w=cols*2+1,h=rows*2+1;
+  const g=Array.from({length:h},()=>Array(w).fill("#"));
+  path.forEach(([i,j],k)=>{g[2*j+1][2*i+1]=".";if(k+1<path.length){const[a,b]=path[k+1];g[j+b+1][i+a+1]=".";}});
+  if(opts.booths){
+    const cand=[];for(let k=1;k<path.length-1;k++)if(ds[k]===ds[k-1])cand.push(k);
+    const pick=[];shuffle(cand).forEach(k=>{if(pick.length<opts.booths&&pick.every(p=>Math.abs(p-k)>=2))pick.push(k);});
+    pick.forEach(k=>{const[i,j]=path[k],[a,b]=path[k+1];g[j+b+1][i+a+1]="B";});
+  }
+  const[s0,s1]=path[0],[g0,g1]=path[path.length-1];
+  g[2*s1+1][2*s0+1]="S";g[2*g1+1][2*g0+1]="G";
+  return build(g.map(r=>r.join("")),opts.landFn||(()=>"FR"),ds[0],opts.cities);
+}
+function L6(){return snake({minLen:11,cities:{start:"Paris",goal:"Lyon"},landFn:()=>"FR"});}
+function L7(){
+  const len=rint(8,11),n=rint(2,5),spots=new Set(shuffle(Array.from({length:len-1},(_,i)=>i+2)).slice(0,n));
+  let row="#S";for(let x=2;x<=len;x++)row+=spots.has(x)?"P":".";row+="G"+"#".repeat(14-row.length-1);
+  return build([W14,W14,row,W14,W14],()=>"SE",1,{start:"Malmö",goal:"Göteborg"},{needReport:true});
+}
+function L8(n){
+  const w=13,h=8,g=Array.from({length:h},()=>Array(w).fill("#"));let x=1,y=6;g[y][x]="S";
+  for(let i=0;i<n;i++){g[y][x+1]=".";g[y][x+2]=".";g[y-1][x+2]=".";x+=2;y-=1;}
+  g[y][x]="G";
+  return build(g.map(r=>r.join("")),()=>"NO",1,{start:"Åndalsnes",goal:"Trollstigen"});
+}
+const GDPR_SETS=[[["RS","DE","PL"],true],[["DE","PL","SE"],true],[["AT","TR","AL"],false],[["SE","RS","AL"],true],[["DE","AT","TR"],true]];
+function L9(c,data){return build([W14,W14,"#S..........G#",W14,W14],x=>x<4?"DK":x<7?c[0]:x<10?c[1]:c[2],1,{start:"Odense",goal:"Kunden"},{data,gdpr:true});}
+const POOL10=["DE","PL","CZ","SE","HU","DK"];
+function L10(){
+  const q=shuffle(POOL10).slice(0,4);
+  return snake({minLen:12,booths:3,cities:{start:"Aalborg",goal:"Bruxelles"},landFn:(x,y,w,h)=>q[(x<w/2?0:1)+(y<h/2?0:2)]});
+}
+
+/* ---------- De 8 baner ----------
+   Hver bane: én ny ting. "explain" forklarer den i almindeligt dansk.
+   Startkoden er delvist udfyldt, så eleven kun skal tilføje den nye del. */
+const POOL7=["DE","SE","PL"];
+const LEVELS=[
+ {title:"Første tur",concept:"Kommandoer",from:"Disponent Hanne",
+  story:"Kør lastbilen fra København til Hamborg.",
+  explain:["Koden læses oppefra og ned, én linje ad gangen.","frem(); kører lastbilen ét felt frem.","højre(); og venstre(); drejer lastbilen, men flytter den ikke.","Hver kommando slutter med ();"],
+  toolName:"Kommandoer",tool:"frem();\nhøjre();\nvenstre();",
+  par:10,chips:[["frem()","frem();"],["højre()","højre();"],["venstre()","venstre();"]],
+  starter:"// Tilføj flere linjer under de to første.\nfrem();\nfrem();\n",
+  hint:"frem(); frem(); frem();\nhøjre();\nfrem(); frem();\nvenstre();\nfrem(); frem(); frem();",
+  display:()=>L1(),variants:()=>[]},
+ {title:"Motorvejen",concept:"for-løkke",from:"Disponent Hanne",
+  story:"Vejen går 11 felter lige ud. I stedet for at skrive frem(); 11 gange kan computeren gentage den for dig.",
+  explain:["En løkke gentager kode, så du ikke skal skrive den mange gange.","Alt mellem { og } bliver gentaget.","Tallet efter i < bestemmer, hvor mange gange."],
+  toolName:"for-løkke",tool:"for (let i = 0; i < 3; i++) {\n  frem();\n}\n// kører frem() 3 gange",
+  par:2,chips:[["frem()","frem();"]],
+  starter:"// Skift 1 ud med det rigtige antal felter.\nfor (let i = 0; i < 1; i++) {\n  frem();\n}\n",
+  hint:"// Tæl felterne fra lastbilen til målet.\nfor (let i = 0; i < 11; i++) {\n  frem();\n}",
+  display:()=>L2(),variants:()=>[]},
+ {title:"Vejarbejde",concept:"while-løkke",from:"Trafikchef Ali",
+  story:"Vejen har en ny længde, hver gang du trykker Kør. Derfor virker et fast tal ikke.",
+  explain:["while gentager koden i { }, så længe betingelsen er sand.","iMål() er sand, når lastbilen er i mål.","! betyder ikke. while (!iMål()) betyder: så længe vi ikke er i mål."],
+  toolName:"while-løkke",tool:"while (!iMål()) {\n  // det her gentages\n}",
+  par:2,chips:[["frem()","frem();"]],
+  starter:"while (!iMål()) {\n  // skriv hvad lastbilen skal gøre her\n\n}\n",
+  hint:"while (!iMål()) {\n  frem();\n}",
+  random:true,display:()=>L3(rint(4,11)),variants:()=>[4,7,11].map(L3)},
+ {title:"Brennerpasset",concept:"if",from:"Trafikchef Ali",
+  story:"Vejen gennem Alperne snor sig, og svingene ligger et nyt sted hver gang. Alle sving går til højre.",
+  explain:["if betyder hvis. Koden i { } kører kun, hvis betingelsen er sand.","vægForan() er sand, når der er en væg lige foran lastbilen.","Så: hvis der er en væg foran, så drej til højre."],
+  toolName:"if",tool:"if (vægForan()) {\n  højre();\n}",
+  par:4,chips:[["vægForan()","vægForan()"],["højre()","højre();"],["if","if () {\n  \n}"]],
+  starter:"while (!iMål()) {\n  // hvis der er en væg foran, så drej til højre\n\n  frem();\n}\n",
+  hint:"while (!iMål()) {\n  if (vægForan()) {\n    højre();\n  }\n  frem();\n}",
+  random:true,display:()=>L4(...SPIRALS[rint(0,1)]),variants:()=>SPIRALS.map(s=>L4(...s))},
+ {title:"Ringvejen",concept:"if / else",from:"Trafikchef Ali",
+  story:"Rundt om Paris går svingene både til højre og til venstre. Lastbilen skal selv vælge.",
+  explain:["else betyder ellers. Koden i else kører, når if ikke er sand.","vejTilHøjre() er sand, når der er vej til højre for lastbilen.","Så: hvis der er vej til højre, så drej højre. Ellers drej venstre."],
+  toolName:"if / else",tool:"if (vejTilHøjre()) {\n  højre();\n} else {\n  venstre();\n}",
+  par:5,chips:[["vejTilHøjre()","vejTilHøjre()"],["højre()","højre();"],["venstre()","venstre();"],["if / else","if () {\n  \n} else {\n  \n}"]],
+  starter:"while (!iMål()) {\n  if (vægForan()) {\n    // vej til højre? så højre. Ellers venstre.\n\n  }\n  frem();\n}\n",
+  hint:"while (!iMål()) {\n  if (vægForan()) {\n    if (vejTilHøjre()) {\n      højre();\n    } else {\n      venstre();\n    }\n  }\n  frem();\n}",
+  random:true,display:()=>L6(),variants:()=>[L6(),L6(),L6(),L6()]},
+ {title:"Optælling",concept:"variabel",from:"Lagerchef Mette",
+  story:"Der ligger pakker på vejen til Göteborg. Tæl dem undervejs, og send tallet til lageret til sidst.",
+  explain:["En variabel er en kasse, der husker et tal.","let antal = 0; laver kassen og lægger 0 i den.","antal++; lægger 1 til tallet i kassen.","pakkeHer() er sand, når lastbilen holder på en pakke."],
+  toolName:"variabel",tool:"let antal = 0;\nantal++;   // nu er antal 1",
+  par:5,chips:[["pakkeHer()","pakkeHer()"],["antal++","antal++;"],["if","if () {\n  \n}"]],
+  starter:"let antal = 0;\n\nwhile (!iMål()) {\n  frem();\n  // hvis der er en pakke her, så læg 1 til antal\n\n}\n\nrapport(antal);\n",
+  hint:"if (pakkeHer()) {\n  antal++;\n}",
+  random:true,display:()=>L7(),variants:()=>[L7(),L7(),L7(),L7()]},
+ {title:"Bompenge",concept:"switch",from:"Økonomichef Sofie",
+  story:"Tre lande, tre bomme. Hver bom skal betales i landets egen valuta, og rækkefølgen skifter hver gang.",
+  explain:["switch kigger på én værdi og hopper til den case, der passer.","land() giver landet for bommen foran dig, fx \"DE\".","break; betyder: stop her, og fortsæt efter switch."],
+  toolName:"switch",tool:"switch (land()) {\n  case \"DE\": betal(\"EUR\"); break;\n}",
+  table:POOL7,par:7,chips:[["case SE","case \"SE\": betal(\"SEK\"); break;"],["case PL","case \"PL\": betal(\"PLN\"); break;"]],
+  starter:"while (!iMål()) {\n  if (bomForan()) {\n    switch (land()) {\n      case \"DE\": betal(\"EUR\"); break;\n      // tilføj SE og PL her\n\n    }\n  }\n  frem();\n}\n",
+  hint:"case \"SE\": betal(\"SEK\"); break;\ncase \"PL\": betal(\"PLN\"); break;",
+  random:true,display:()=>L5(shuffle(POOL7)),variants:()=>[["DE","SE","PL"],["SE","PL","DE"],["PL","DE","SE"]].map(L5)},
+ {title:"GDPR-transporten",concept:"og / ikke",from:"Jurist Karim",
+  story:"Finalen. Lastbilen har måske persondata med. I spillet gælder en simpel regel: persondata må ikke køre ud af EU.",
+  explain:["Persondata er oplysninger om personer, fx navne og adresser.","Lande med en stjerne på kortet er i EU. iEU() er sand, hvis landet foran er i EU.","&& betyder og: begge dele skal være sande.","Har du persondata, og er landet foran ikke i EU, så aflever() først."],
+  toolName:"&& og !",tool:"if (persondata() && !iEU()) {\n  aflever();\n}",
+  par:4,chips:[["persondata()","persondata()"],["!iEU()","!iEU()"],["aflever()","aflever();"],["if","if () {\n  \n}"]],
+  starter:"while (!iMål()) {\n  // persondata OG landet foran er IKKE i EU? så aflever\n\n  frem();\n}\n",
+  hint:"if (persondata() && !iEU()) {\n  aflever();\n}",
+  random:true,display:()=>{const s=GDPR_SETS[rint(0,GDPR_SETS.length-1)];return L9(s[0],Math.random()<.7?true:s[1]);},
+  variants:()=>GDPR_SETS.map(s=>L9(s[0],s[1]))}
+];
+LEVELS.forEach((L,i)=>L.id=i+1);
+
+
+/* =====================================================================
+   DATA-LAGER — lokal (faner i samme browser) eller live (Supabase)
+   ===================================================================== */
+function localStore(code){
+  const KEY="route-eu.room.v3."+code;let mem={players:{},events:[],paused:false};
+  let bc=null;try{bc=new BroadcastChannel(KEY);}catch(e){}
+  const subs=new Set();
+  const read=()=>LS.get(KEY,null)||mem;
+  const emit=()=>{const s=read();subs.forEach(f=>f(s));};
+  const write=s=>{mem=s;LS.set(KEY,s);try{bc&&bc.postMessage(1);}catch(e){}emit();};
+  if(bc)bc.onmessage=emit;
+  const onStorage=e=>{if(e.key===KEY)emit();};window.addEventListener("storage",onStorage);
+  return {mode:"local",code,
+    upsertPlayer(p){const s=read();s.players[p.id]=Object.assign(s.players[p.id]||{},p);write(s);},
+    addEvent(ev){const s=read();s.events.push(Object.assign({id:uuid()},ev));s.events=s.events.slice(-100);write(s);},
+    async checkPin(p){return p===CONFIG.ADMIN_PIN;},
+    async removePlayer(id){const s=read();delete s.players[id];s.events=s.events.filter(e=>e.player_id!==id);write(s);},
+    async clear(){const s=read();write({players:{},events:[],paused:!!s.paused});},
+    async setPaused(p){const s=read();s.paused=!!p;write(s);},
+    subscribe(f){subs.add(f);f(read());return ()=>subs.delete(f);},
+    close(){subs.clear();window.removeEventListener("storage",onStorage);try{bc&&bc.close();}catch(e){}}
+  };
+}
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error("kunne ikke hente Supabase-biblioteket"));document.head.appendChild(s);});}
+async function liveStore(code){
+  if(!window.supabase)await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js");
+  const opts={auth:{persistSession:false,autoRefreshToken:false}};
+  const sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY,opts);
+  let adm=null;
+  const admin=()=>{const pin=SS.get("route-eu.pin.v3","");if(!adm||adm._pin!==pin){adm=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY,Object.assign({global:{headers:{"x-admin-pin":pin}}},opts));adm._pin=pin;}return adm;};
+  const state={players:{},events:[],paused:false},subs=new Set(),emit=()=>subs.forEach(f=>f(state));
+  const r1=await sb.from("players").select("*").eq("session",code);
+  if(r1.error)throw new Error(r1.error.message);
+  (r1.data||[]).forEach(p=>state.players[p.id]=p);
+  const r2=await sb.from("events").select("*").eq("session",code).order("created_at",{ascending:false}).limit(100);
+  state.events=(r2.data||[]).reverse();
+  const r3=await sb.from("rooms").select("paused").eq("session",code).maybeSingle();
+  state.paused=!!(r3.data&&r3.data.paused);
+  const ch=sb.channel("room-"+code)
+    .on("postgres_changes",{event:"*",schema:"public",table:"rooms",filter:"session=eq."+code},m=>{if(m.new){state.paused=!!m.new.paused;emit();}})
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"players",filter:"session=eq."+code},m=>{state.players[m.new.id]=m.new;emit();})
+    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"players",filter:"session=eq."+code},m=>{state.players[m.new.id]=m.new;emit();})
+    .on("postgres_changes",{event:"DELETE",schema:"public",table:"players"},m=>{if(m.old&&state.players[m.old.id]){delete state.players[m.old.id];emit();}})
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"events",filter:"session=eq."+code},m=>{state.events.push(m.new);state.events=state.events.slice(-100);emit();})
+    .on("postgres_changes",{event:"DELETE",schema:"public",table:"events"},m=>{const n=state.events.length;state.events=state.events.filter(e=>e.id!==(m.old&&m.old.id));if(state.events.length!==n)emit();})
+    .subscribe();
+  return {mode:"live",code,
+    async upsertPlayer(p){state.players[p.id]=Object.assign(state.players[p.id]||{},p);emit();const {error}=await sb.from("players").upsert(state.players[p.id]);if(error)console.warn(error);},
+    async addEvent(ev){const {error}=await sb.from("events").insert(ev);if(error)console.warn(error);},
+    async checkPin(p){const {data,error}=await sb.rpc("check_pin",{p});if(error)throw new Error(error.message);return data===true;},
+    async removePlayer(id){
+      const a=admin();await a.from("events").delete().eq("player_id",id);
+      const r=await a.from("players").delete().eq("id",id).select("id");
+      if(r.error)throw new Error(r.error.message);if(!r.data||!r.data.length)throw new Error("Databasen afviste sletningen. Tjek PIN-koden i tabellen admin_secret.");
+      delete state.players[id];state.events=state.events.filter(e=>e.player_id!==id);emit();
+    },
+    async clear(){
+      const a=admin();await a.from("events").delete().eq("session",code);
+      const r=await a.from("players").delete().eq("session",code).select("id");
+      if(r.error)throw new Error(r.error.message);
+      if(Object.keys(state.players).length&&(!r.data||!r.data.length))throw new Error("Databasen afviste sletningen. Tjek PIN-koden i tabellen admin_secret.");
+      state.players={};state.events=[];emit();
+    },
+    async setPaused(p){
+      const r=await admin().from("rooms").upsert({session:code,paused:!!p,updated_at:new Date().toISOString()}).select("paused");
+      if(r.error)throw new Error(r.error.message);if(!r.data||!r.data.length)throw new Error("Databasen afviste pausen. Tjek PIN-koden i tabellen admin_secret.");
+      state.paused=!!p;emit();
+    },
+    subscribe(f){subs.add(f);f(state);return ()=>subs.delete(f);},
+    close(){subs.clear();sb.removeChannel(ch);}
+  };
+}
+let store=null,snap={players:{},events:[]},storeWarn="";
+async function openStore(code){
+  if(store){store.close();store=null;}
+  storeWarn="";
+  if(isLive()){
+    try{store=await Promise.race([liveStore(code),new Promise((_,rej)=>setTimeout(()=>rej(new Error("intet svar efter 6 sekunder")),6000))]);}
+    catch(e){console.warn(e);storeWarn="Kunne ikke forbinde til Supabase ("+(e.message||e)+"). Kører lokalt i stedet. Tjek URL, nøgle og at supabase-setup.sql er kørt.";}
+  }
+  if(!store)store=localStore(code);
+  store.subscribe(s=>{snap=s;renderLive();});
+}
+function view(){
+  const players=Object.values(snap.players||{}),events=(snap.events||[]).slice();
+  events.sort((a,b)=>a.created_at<b.created_at?-1:1);
+  return {players,events:events.slice(-60)};
+}
+
+/* =====================================================================
+   SPILLER + FREMSKRIDT
+   ===================================================================== */
+let ME=LS.get("route-eu.me.v3",null);
+let ROOM=CONFIG.ROUND;
+if(ME&&ME.code!==ROOM)ME=null;
+let PROG=null;
+const progKey=id=>"route-eu.prog.v3."+id;
+function loadProg(){PROG=Object.assign({level:0,codes:{},best:{},hints:{},attempts:{},skipped:{},started:{}},ME?LS.get(progKey(ME.id),{}):{});}
+function saveProg(){if(ME)LS.set(progKey(ME.id),PROG);}
+const total=()=>Object.values(PROG.best).reduce((a,b)=>a+b,0);
+const solvedCount=()=>Object.keys(PROG.best).length;
+const unlocked=i=>i===0||PROG.best[i-1]!=null||PROG.skipped[i-1];
+function syncMe(extra){
+  if(!ME||!store||store.code!==ME.code)return;
+  const L=PROG.level;
+  store.upsertPlayer(Object.assign({
+    id:ME.id,session:ME.code,name:ME.name,level:L+1,score:total(),solved:solvedCount(),best:PROG.best,
+    attempts:PROG.attempts[L]||0,hints:Object.keys(PROG.hints).length,
+    level_started_at:iso(PROG.started[L]||now()),updated_at:iso(now()),joined_at:ME.joined||iso(now())
+  },extra||{}));
+}
+function sendEvent(kind,extra){if(ME&&store&&store.code===ME.code)store.addEvent(Object.assign({session:ME.code,player_id:ME.id,name:ME.name,kind,created_at:iso(now())},extra||{}));}
+
+/* =====================================================================
+   EDITOR
+   ===================================================================== */
+const ta=$("#code"),hl=$("#hl"),gut=$("#gut");
+const API=new Set(["frem","venstre","højre","hojre","vægForan","vaegForan","vejTilHøjre","vejTilHojre","vejTilVenstre","iMål","iMaal","land","bomForan","betal","pakkeHer","rapport","persondata","iEU","aflever","log"]);
+const KW=/^(while|for|if|else|switch|case|break|default|let|const|var|function|return|true|false|do)$/;
+function highlight(src){
+  const re=/(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\\n]|\\.)*"?|'(?:[^'\\\n]|\\.)*'?)|(\d+)|([A-Za-zÆØÅæøåÖöÄä_$][\wÆØÅæøåÖöÄä$]*)/g;
+  let out="",last=0,m;
+  while((m=re.exec(src))){
+    out+=esc(src.slice(last,m.index));const t=m[0];let c=null;
+    if(m[1])c="c";else if(m[2])c="s";else if(m[3])c="n";else if(m[4]){if(KW.test(t))c="k";else if(API.has(t))c="f";}
+    out+=c?'<span class="t-'+c+'">'+esc(t)+"</span>":esc(t);last=re.lastIndex;
+  }
+  return out+esc(src.slice(last));
+}
+function countLines(code){return code.replace(/\/\*[\s\S]*?\*\//g,"").split("\n").map(l=>l.replace(/\/\/.*$/,"").replace(/[{}\s;]/g,"")).filter(Boolean).length;}
+function syncScroll(){hl.scrollTop=ta.scrollTop;hl.scrollLeft=ta.scrollLeft;gut.scrollTop=ta.scrollTop;}
+function refresh(save){
+  hl.innerHTML=highlight(ta.value)+"\n ";
+  gut.textContent=Array.from({length:ta.value.split("\n").length},(_,i)=>i+1).join("\n")+"\n ";
+  const L=LEVELS[PROG.level],n=countLines(ta.value);
+  $("#lc").innerHTML='<b class="'+(n>L.par?"over":"")+'">'+n+"</b> linjer · par "+L.par;
+  if(save!==false){PROG.codes[PROG.level]=ta.value;saveProg();}
+  syncScroll();
+}
+ta.addEventListener("input",()=>refresh());
+ta.addEventListener("scroll",syncScroll);
+ta.addEventListener("keydown",e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();run();return;}
+  if(e.key==="Tab"&&!e.shiftKey){e.preventDefault();ta.setRangeText("  ",ta.selectionStart,ta.selectionEnd,"end");refresh();return;}
+  if(e.key==="Enter"&&!e.altKey&&!e.shiftKey){
+    const s=ta.selectionStart,before=ta.value.slice(0,s),line=before.slice(before.lastIndexOf("\n")+1);
+    let ind=(line.match(/^\s*/)||[""])[0];if(/\{\s*$/.test(line))ind+="  ";
+    e.preventDefault();ta.setRangeText("\n"+ind,s,ta.selectionEnd,"end");refresh();return;
+  }
+  if(e.key==="}"){
+    const s=ta.selectionStart,before=ta.value.slice(0,s),ls=before.lastIndexOf("\n")+1,line=before.slice(ls);
+    if(/^\s{2,}$/.test(line)){e.preventDefault();ta.setRangeText(line.slice(2)+"}",ls,ta.selectionEnd,"end");refresh();}
+  }
+});
+function insert(text){
+  const s=ta.selectionStart,before=ta.value.slice(0,s),line=before.slice(before.lastIndexOf("\n")+1);
+  const lineInd=/^\s*$/.test(line)?line:(line.match(/^\s*/)||[""])[0];
+  const body=text.split("\n").map((l,i)=>i?lineInd+l:l).join("\n");
+  const multi=text.includes("\n")||text.endsWith(";");
+  ta.focus();ta.setRangeText(body+(multi?"\n"+lineInd:""),s,ta.selectionEnd,"end");refresh();
+}
+
+/* ---------- Log + status + lyd ---------- */
+const logEl=$("#log");
+function print(kind,text){const li=document.createElement("li");li.className=kind;li.textContent=text;logEl.appendChild(li);logEl.scrollTop=logEl.scrollHeight;}
+function setStatus(s,t){const el=$("#status");el.dataset.s=s;el.textContent=t;}
+let AC=null;
+function beep(freqs,dur,type){
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    freqs.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+i*dur*.8;
+      o.type=type||"triangle";o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.1,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+      o.connect(g).connect(AC.destination);o.start(t);o.stop(t+dur+.02);});
+  }catch(e){}
+}
+
+/* =====================================================================
+   KORT + ANIMATION
+   ===================================================================== */
+const cv=$("#cv"),ctx=cv.getContext("2d"),box=$("#mapbox");
+let cs=48,dpr=1,variant=null,dirty=true,speed=1,TH={};
+function readTheme(){TH={accent:cssVar("--yellow"),road:cssVar("--map-road"),edge:cssVar("--map-edge"),label:cssVar("--text"),red:cssVar("--bad"),green:cssVar("--ok"),pkg:cssVar("--map-package"),hue:parseFloat(cssVar("--map-hue"))||222,landL:parseFloat(cssVar("--map-land-l"))||21,blue:cssVar("--code-fn"),mono:cssVar("--font-mono"),ui:cssVar("--font-ui"),sign:cssVar("--sign")};}
+const A={x:0,y:0,ang:0,trail:[],seen:new Set(),paid:new Set(),payP:{},q:[],cur:null,t:0,flash:0,shook:false,onDone:null,running:false,conf:[],data:false};
+function layout(){
+  if(!variant||!box.clientWidth)return;
+  const availW=box.clientWidth-40,availH=box.clientHeight-40;
+  const maxH=availH>120?availH:Math.max(240,Math.min(480,window.innerHeight*.55));
+  cs=Math.max(14,Math.floor(Math.min(availW/variant.w,maxH/variant.h,72)));
+  dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=cs*variant.w*dpr;cv.height=cs*variant.h*dpr;
+  cv.style.width=cs*variant.w+"px";cv.style.height=cs*variant.h+"px";dirty=true;
+}
+new ResizeObserver(layout).observe(box);
+function resetAnim(){
+  A.x=variant.start.x;A.y=variant.start.y;A.ang=variant.start.dir*90;
+  A.trail=[[A.x,A.y]];A.seen=new Set([A.x+","+A.y]);A.paid=new Set();A.payP={};A.q=[];A.cur=null;A.t=0;A.flash=0;A.conf=[];A.running=false;A.onDone=null;
+  A.data=!!variant.data;dirty=true;updateCargo();
+}
+function updateCargo(){
+  const c=$("#cargo");if(!variant||!variant.gdpr){c.hidden=true;return;}
+  c.hidden=false;c.dataset.s=A.data?"fast":"";c.textContent=A.data?"Last: persondata":"Last: ingen persondata";
+}
+const DUR={move:220,turn:170,pay:460,crash:560,report:320,drop:420};
+const ease=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+function nextAction(){
+  while(A.q.length&&A.q[0].t==="log")print("user","› "+A.q.shift().msg);
+  if(!A.q.length){A.cur=null;if(A.running){A.running=false;const f=A.onDone;A.onDone=null;f&&f();}return;}
+  const a=A.q.shift();a.fx=A.x;a.fy=A.y;a.fa=A.ang;A.cur=a;A.t=0;A.shook=false;
+}
+function progress(a,p){
+  const e=ease(p);
+  if(a.t==="move"){A.x=a.fx+(a.x-a.fx)*e;A.y=a.fy+(a.y-a.fy)*e;}
+  else if(a.t==="turn")A.ang=a.fa+90*a.r*e;
+  else if(a.t==="pay")A.payP[a.x+","+a.y]=e;
+  else if(a.t==="crash"){const k=Math.sin(Math.PI*Math.min(p*1.4,1))*.36;A.x=a.fx+(a.x-a.fx)*k;A.y=a.fy+(a.y-a.fy)*k;
+    if(p>.3&&!A.shook){A.shook=true;A.flash=1;beep([180,120],.18,"sawtooth");if(!reduce){box.classList.remove("shake");void box.offsetWidth;box.classList.add("shake");}}}
+}
+function finish(a){
+  if(a.t==="move"){A.x=a.x;A.y=a.y;A.trail.push([a.x,a.y]);A.seen.add(a.x+","+a.y);}
+  else if(a.t==="turn")A.ang=a.fa+90*a.r;
+  else if(a.t==="pay"){A.paid.add(a.x+","+a.y);print("ok","Betalt "+a.v+" i "+a.l+". Bommen går op.");beep([660,990],.09);}
+  else if(a.t==="crash"){A.x=a.fx;A.y=a.fy;}
+  else if(a.t==="report"){print("ok","Rapport sendt: "+a.n+" pakker. Lageret siger tak.");beep([700,880],.08);}
+  else if(a.t==="drop"){A.data=false;updateCargo();print("ok","Persondata afleveret sikkert, før grænsen til "+a.l+".");beep([520,780],.1);}
+}
+function confetti(){
+  if(reduce)return;
+  for(let i=0;i<70;i++){const a=Math.random()*Math.PI*2,v=1.5+Math.random()*4.5;
+    A.conf.push({x:(A.x+.5)*cs,y:(A.y+.5)*cs,vx:Math.cos(a)*v,vy:Math.sin(a)*v-3,r:3+Math.random()*4,rot:Math.random()*6,vr:(Math.random()-.5)*.3,life:1});}
+}
+let last=performance.now();
+function frame(t){
+  const dt=Math.min(64,t-last);last=t;
+  if(A.cur){A.t+=dt*speed;const p=Math.min(1,A.t/DUR[A.cur.t]);progress(A.cur,p);if(p>=1){finish(A.cur);nextAction();}dirty=true;}
+  else if(A.running){nextAction();dirty=true;}
+  if(A.flash>0){A.flash=Math.max(0,A.flash-dt/450);dirty=true;}
+  if(A.conf.length){A.conf.forEach(c=>{c.x+=c.vx*dt/16;c.y+=c.vy*dt/16;c.vy+=.12*dt/16;c.rot+=c.vr;c.life-=dt/1700;});A.conf=A.conf.filter(c=>c.life>0);dirty=true;}
+  if(dirty&&variant&&!$("#view-spil").hidden){draw();dirty=false;}
+  requestAnimationFrame(frame);
+}
+function starPts(cx,cy,r){const p=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.42:r;p.push([cx+Math.cos(a)*rr,cy+Math.sin(a)*rr]);}return p;}
+function starPath(cx,cy,r){const p=starPts(cx,cy,r);ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath();}
+function draw(){
+  const v=variant,W=v.w*cs,H=v.h*cs,isRoad=(x,y)=>{const c=(v.cells[y]||[])[x];return !!c&&c!=="#";};
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+  for(let y=0;y<v.h;y++)for(let x=0;x<v.w;x++){
+    const c=v.cells[y][x],l=v.land[y][x],off=(COUNTRIES[l]||[0,0,1,0])[3],x0=x*cs,y0=y*cs;
+    ctx.fillStyle="hsl("+(TH.hue+off)+" 52% "+(TH.landL+((x+y)%2)*.8)+"%)";ctx.fillRect(x0,y0,cs,cs);
+    if(c==="#"){
+      if(v.gdpr&&!EU[l]){ctx.save();ctx.beginPath();ctx.rect(x0,y0,cs,cs);ctx.clip();ctx.strokeStyle="rgba(255,90,78,.2)";ctx.lineWidth=1;ctx.beginPath();for(let k=-cs;k<cs;k+=7){ctx.moveTo(x0+k,y0+cs);ctx.lineTo(x0+k+cs,y0);}ctx.stroke();ctx.restore();}
+      else if((x*7+y*13)%5<2){ctx.fillStyle="rgba(238,241,248,.07)";ctx.beginPath();ctx.arc(x0+cs*((x*3+y)%4+1)/5,y0+cs*((x+y*5)%4+1)/5,Math.max(1,cs*.035),0,7);ctx.fill();}
+    }else{
+      ctx.fillStyle=TH.road;ctx.fillRect(x0,y0,cs,cs);ctx.strokeStyle=TH.edge;ctx.lineWidth=1;
+      if(!isRoad(x,y-1)){ctx.beginPath();ctx.moveTo(x0,y0+.5);ctx.lineTo(x0+cs,y0+.5);ctx.stroke();}
+      if(!isRoad(x,y+1)){ctx.beginPath();ctx.moveTo(x0,y0+cs-.5);ctx.lineTo(x0+cs,y0+cs-.5);ctx.stroke();}
+      if(!isRoad(x-1,y)){ctx.beginPath();ctx.moveTo(x0+.5,y0);ctx.lineTo(x0+.5,y0+cs);ctx.stroke();}
+      if(!isRoad(x+1,y)){ctx.beginPath();ctx.moveTo(x0+cs-.5,y0);ctx.lineTo(x0+cs-.5,y0+cs);ctx.stroke();}
+    }
+  }
+  ctx.setLineDash([4,4]);ctx.strokeStyle="rgba(255,204,0,.5)";ctx.lineWidth=1.5;
+  for(let y=0;y<v.h;y++)for(let x=0;x<v.w;x++){const l=v.land[y][x];
+    if(x+1<v.w&&v.land[y][x+1]!==l){ctx.beginPath();ctx.moveTo((x+1)*cs,y*cs);ctx.lineTo((x+1)*cs,(y+1)*cs);ctx.stroke();}
+    if(y+1<v.h&&v.land[y+1][x]!==l){ctx.beginPath();ctx.moveTo(x*cs,(y+1)*cs);ctx.lineTo((x+1)*cs,(y+1)*cs);ctx.stroke();}}
+  ctx.setLineDash([]);
+  const seen={},fs=Math.max(9,Math.round(cs*.21));ctx.font="700 "+fs+"px "+TH.mono;ctx.textAlign="left";ctx.textBaseline="top";
+  for(let y=0;y<v.h;y++)for(let x=0;x<v.w;x++){const l=v.land[y][x];if(!seen[l]&&v.cells[y][x]==="#"){seen[l]=1;
+    let tx=x*cs+5;if(EU[l]){ctx.fillStyle=TH.accent;starPath(tx+fs*.45,y*cs+4+fs*.5,fs*.45);ctx.fill();tx+=fs*1.05;}
+    ctx.fillStyle="rgba(238,241,248,.62)";ctx.fillText(l,tx,y*cs+5);}}
+  ctx.fillStyle="rgba(255,204,0,.35)";A.trail.forEach(([x,y])=>{ctx.beginPath();ctx.arc((x+.5)*cs,(y+.5)*cs,cs*.06,0,7);ctx.fill();});
+  for(let y=0;y<v.h;y++)for(let x=0;x<v.w;x++){
+    const c=v.cells[y][x];
+    if(c==="P"){const got=A.seen.has(x+","+y),cx=(x+.5)*cs,cy=(y+.5)*cs,s=cs*.36;
+      ctx.globalAlpha=got?.45:1;ctx.fillStyle=TH.pkg;ctx.fillRect(cx-s/2,cy-s/2,s,s);ctx.fillStyle="rgba(6,16,42,.45)";ctx.fillRect(cx-s*.08,cy-s/2,s*.16,s);ctx.globalAlpha=1;}
+    if(c==="B"){
+      const k=x+","+y,p=A.paid.has(k)?1:(A.payP[k]||0),horiz=isRoad(x-1,y)||isRoad(x+1,y);
+      ctx.save();ctx.translate((x+.5)*cs,(y+.5)*cs);if(!horiz)ctx.rotate(Math.PI/2);
+      ctx.fillStyle="#18234d";ctx.fillRect(-cs*.16,-cs*.86,cs*.32,cs*.3);
+      ctx.fillStyle=p>=1?TH.green:TH.red;ctx.fillRect(-cs*.05,-cs*.76,cs*.1,cs*.1);
+      ctx.translate(0,-cs*.42);ctx.rotate(-p*Math.PI/2*.92);
+      const len=cs*.84,seg=len/6;for(let i=0;i<6;i++){ctx.fillStyle=i%2?"#eef1f8":TH.red;ctx.fillRect(-cs*.05,i*seg,cs*.1,seg);}
+      ctx.restore();
+    }
+  }
+  const gx=(v.goal.x+.5)*cs,gy=(v.goal.y+.5)*cs,gs=cs*.62;
+  ctx.fillStyle=TH.sign;ctx.fillRect(gx-gs/2,gy-gs/2,gs,gs);
+  ctx.strokeStyle="#fff";ctx.lineWidth=Math.max(1.2,cs*.03);ctx.strokeRect(gx-gs/2+cs*.05,gy-gs/2+cs*.05,gs-cs*.1,gs-cs*.1);
+  ctx.fillStyle=TH.accent;starPath(gx,gy,cs*.17);ctx.fill();
+  ctx.font="800 "+Math.max(10,Math.round(cs*.22))+"px "+TH.ui;ctx.textBaseline="middle";ctx.textAlign="center";
+  [[v.start,v.cities.start],[v.goal,v.cities.goal]].forEach(([p,name])=>{
+    const t=name.toUpperCase(),tw=ctx.measureText(t).width,ty=p.y>0?(p.y-.5)*cs:(p.y+1.5)*cs;
+    const tx=Math.min(W-tw/2-6,Math.max(tw/2+6,(p.x+.5)*cs));
+    ctx.fillStyle="#fff";ctx.fillRect(tx-tw/2-6,ty-cs*.17,tw+12,cs*.34);
+    ctx.fillStyle="#0E2363";ctx.fillText(t,tx,ty+cs*.02);});
+  ctx.save();ctx.translate((A.x+.5)*cs,(A.y+.5)*cs);ctx.rotate(A.ang*Math.PI/180);
+  const L=cs*.74,Wd=cs*.42,cab=L*.3;
+  const grd=ctx.createLinearGradient(0,-L/2,0,-L/2-cs*.5);grd.addColorStop(0,"rgba(255,230,140,.35)");grd.addColorStop(1,"rgba(255,230,140,0)");
+  ctx.fillStyle=grd;ctx.beginPath();ctx.moveTo(-Wd*.4,-L/2);ctx.lineTo(Wd*.4,-L/2);ctx.lineTo(Wd*.9,-L/2-cs*.5);ctx.lineTo(-Wd*.9,-L/2-cs*.5);ctx.closePath();ctx.fill();
+  ctx.fillStyle="#040a1e";[[-1,-.2],[1,-.2],[-1,.3],[1,.3]].forEach(([sx,sy])=>ctx.fillRect(sx*Wd/2-(sx>0?0:cs*.06),sy*L-cs*.07,cs*.06,cs*.14));
+  ctx.fillStyle=TH.accent;ctx.fillRect(-Wd/2,-L/2+cab+cs*.03,Wd,L-cab-cs*.03);
+  if(A.data){ctx.fillStyle=TH.blue;ctx.fillRect(-Wd*.22,-L/2+cab+cs*.12,Wd*.44,Wd*.44);}
+  else{ctx.fillStyle=TH.sign;ctx.fillRect(-Wd/2+cs*.05,-L/2+cab+cs*.1,Wd-cs*.1,cs*.05);}
+  ctx.fillStyle="#eef1f8";ctx.fillRect(-Wd*.46,-L/2,Wd*.92,cab);
+  ctx.fillStyle="#13225a";ctx.fillRect(-Wd*.36,-L/2+cs*.04,Wd*.72,cab*.38);
+  ctx.restore();
+  A.conf.forEach(c=>{ctx.save();ctx.globalAlpha=Math.max(0,c.life);ctx.translate(c.x,c.y);ctx.rotate(c.rot);ctx.fillStyle=TH.accent;starPath(0,0,c.r);ctx.fill();ctx.restore();});
+  if(A.flash>0){ctx.fillStyle="rgba(255,90,78,"+(A.flash*.28)+")";ctx.fillRect(0,0,W,H);}
+}
+
+/* =====================================================================
+   KØRSEL AF ELEVENS KODE
+   ===================================================================== */
+const WORKER_SRC=simulate.toString()+"\nonmessage=function(e){postMessage(e.data.variants.map(function(v){return simulate(v,e.data.code);}));};";
+let WORKER_URL=null;try{WORKER_URL=URL.createObjectURL(new Blob([WORKER_SRC],{type:"text/javascript"}));}catch(e){}
+function execute(code,variants){
+  return new Promise(res=>{
+    let w;
+    try{w=new Worker(WORKER_URL);}catch(e){return res(variants.map(v=>simulate(v,code)));}
+    const to=setTimeout(()=>{w.terminate();res([{status:"error",msg:"Koden kørte i over 2 sekunder uden at blive færdig. Der er sikkert en uendelig løkke, fx en while, hvis betingelse aldrig bliver falsk.",actions:[]}]);},2500);
+    w.onmessage=e=>{clearTimeout(to);w.terminate();res(e.data);};
+    w.onerror=e=>{clearTimeout(to);w.terminate();if(e.preventDefault)e.preventDefault();res(variants.map(v=>simulate(v,code)));};
+    w.postMessage({code,variants});
+  });
+}
+function setRunning(on){$("#run").disabled=on;$("#hintBtn").disabled=on||!!PROG.hints[PROG.level];$("#skipBtn").disabled=on;}
+async function run(){
+  if(A.running)return;
+  beep([440],.05);
+  const L=LEVELS[PROG.level];
+  if(L.random){variant=L.display();layout();}
+  resetAnim();$("#win").hidden=true;logEl.innerHTML="";
+  print("info","Kører rute.js …");setStatus("run","Kører");setRunning(true);
+  const code=ta.value,results=await execute(code,[variant].concat(L.variants()));
+  A.q=(results[0].actions||[]).slice();A.running=true;A.onDone=()=>conclude(results,code);
+}
+function conclude(results,code){
+  const i=PROG.level,L=LEVELS[i],r0=results[0];setRunning(false);
+  if(r0.status==="goal"){
+    const others=results.slice(1),bad=others.filter(r=>r.status!=="goal");
+    if(bad.length){
+      setStatus("bad","Ikke stabil");beep([300,220],.16);
+      print("warn","Det virkede på den her rute. Men vejen ændrer sig, og koden fejlede på "+bad.length+" af "+others.length+" andre ruter:");
+      print("bad",bad[0].msg||"Lastbilen nåede ikke frem.");
+      failed("ustabil");return;
+    }
+    const lines=countLines(code),hint=PROG.hints[i]?1:0,score=Math.max(20,100-10*Math.max(0,lines-L.par)-30*hint);
+    const prev=PROG.best[i];
+    if(prev==null||score>prev){PROG.best[i]=score;saveProg();}
+    setStatus("ok","Leveret");beep([523,659,784,1046],.12);confetti();
+    print("ok","Leveret: "+variant.cities.start+" → "+variant.cities.goal+". "+score+" point ("+lines+" linjer, par "+L.par+(hint?", hint brugt":"")+").");
+    if(L.random)print("info","Testet på "+results.length+" forskellige ruter. Alle gik godt.");
+    $("#winScore").innerHTML=score+"<small>point</small>";
+    $("#winDetail").textContent=lines+" linjer · par "+L.par+(hint?" · hint brugt":"")+(prev!=null&&score>prev?" · ny rekord":"");
+    $("#nextBtn").hidden=i>=LEVELS.length-1;
+    setTimeout(()=>{$("#win").hidden=false;},reduce?0:650);
+    syncMe({last_result:"goal"});
+    if(prev==null){sendEvent("solve",{level:i+1,points:score});if(solvedCount()===LEVELS.length)sendEvent("finish");}
+    else if(score>prev)sendEvent("improve",{level:i+1,points:score-prev});
+    renderLevels();renderMe();renderSkip();
+  }else{
+    setStatus("bad",r0.status==="crash"?"Crash":r0.status==="stopped"?"Ikke i mål":"Fejl");
+    print(r0.status==="stopped"?"warn":"bad",r0.msg);
+    if(r0.status!=="crash")beep([260,200],.14);
+    failed(r0.status);
+  }
+}
+function failed(kind){
+  const i=PROG.level;
+  if(PROG.best[i]==null){PROG.attempts[i]=(PROG.attempts[i]||0)+1;saveProg();}
+  syncMe({last_result:kind});renderSkip();
+}
+
+/* =====================================================================
+   SPIL-UI
+   ===================================================================== */
+function renderLevels(){
+  const nav=$("#levels");nav.innerHTML="";
+  LEVELS.forEach((L,i)=>{
+    const b=document.createElement("button");b.type="button";b.className="lv"+(PROG.best[i]!=null?" done":"");
+    b.setAttribute("aria-current",i===PROG.level?"true":"false");b.disabled=!unlocked(i);
+    b.innerHTML='<span class="n">'+L.id+'</span><span>'+esc(L.title)+'</span>'+(PROG.best[i]!=null?'<span class="p">'+PROG.best[i]+'</span>':"");
+    if(b.disabled)b.title="Klar bane "+i+" først";
+    b.onclick=()=>loadLevel(i);nav.appendChild(b);
+  });
+  const cur=nav.children[PROG.level];if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:"nearest",inline:"nearest"});
+}
+function codeify(t){
+  const re=/(while \(!iMål\(\)\)|let antal = 0;|antal\+\+;|break;|i <|\{ og \}|&&|![A-Za-zÆØÅæøå]+\(\)|[A-Za-zÆØÅæøå]+\(\);?|"[A-Z]{2}"|\b(?:if|else|while|switch|case)\b|!(?= betyder))/g;
+  let out="",last=0,m;while((m=re.exec(t))){out+=esc(t.slice(last,m.index))+"<code>"+esc(m[0])+"</code>";last=re.lastIndex;}
+  return out+esc(t.slice(last));
+}
+function renderTicket(){
+  const L=LEVELS[PROG.level],t=$("#ticket");
+  let h='<div class="ticket"><div class="of"><span class="lbl">Bane '+L.id+'/'+LEVELS.length+'</span><span class="lbl" style="color:var(--yellow)">'+esc(L.concept)+'</span><span class="lbl">Fra '+esc(L.from)+'</span></div>'+
+    '<h2>'+esc(L.title)+'</h2><p class="story">'+esc(L.story)+'</p>'+
+    '<div class="explain"><p class="lbl">Sådan virker det</p><ul>'+L.explain.map(x=>'<li>'+codeify(x)+'</li>').join("")+'</ul></div>'+
+    '<div class="tool"><p class="lbl">Eksempel</p><pre class="codeblock">'+highlight(L.tool)+'</pre></div>';
+  if(L.table)h+='<table class="cur"><tbody>'+L.table.map(k=>'<tr><td>'+k+' · '+NAMES[k]+'</td><td>'+CUR[k]+'</td></tr>').join("")+'</tbody></table>';
+  h+='<div class="chips" id="chips"></div>';
+  if(PROG.hints[PROG.level])h+='<div class="hintbox"><p class="lbl" style="color:var(--yellow)">Hint</p><pre>'+highlight(L.hint)+'</pre></div>';
+  t.innerHTML=h+'</div>';
+  L.chips.forEach(([label,text])=>{const c=document.createElement("button");c.className="chip";c.type="button";c.textContent=label;c.title="Indsæt i koden";c.onclick=()=>insert(text);$("#chips").appendChild(c);});
+  const hb=$("#hintBtn");hb.disabled=!!PROG.hints[PROG.level]||A.running;hb.innerHTML=PROG.hints[PROG.level]?"Hint vist":'Hint <span class="k">−30</span>';
+}
+function renderSkip(){
+  const i=PROG.level,b=$("#skipBtn");
+  b.hidden=!(PROG.best[i]==null&&!PROG.skipped[i]&&(PROG.attempts[i]||0)>=4&&i<LEVELS.length-1);
+}
+function renderMe(){
+  const el=$("#me");
+  if(ME){el.innerHTML='<b>'+esc(ME.name)+'</b><span class="pts">'+total()+' p</span><button class="btn quiet sm" id="logout">Log ud</button>';$("#logout").onclick=logout;}
+  else el.innerHTML='<a class="btn primary sm" href="#spil">Log ind og spil</a>';
+}
+function loadLevel(i){
+  if(!unlocked(i))return;
+  PROG.level=i;if(!PROG.started[i])PROG.started[i]=now();saveProg();
+  const L=LEVELS[i];variant=L.display();layout();resetAnim();
+  ta.value=PROG.codes[i]!=null?PROG.codes[i]:L.starter;ta.scrollTop=0;refresh(false);
+  $("#win").hidden=true;setStatus("idle","Klar");setRunning(false);
+  $("#mapTitle").innerHTML=esc(variant.cities.start)+'<span class="arr">→</span>'+esc(variant.cities.goal);
+  renderLevels();renderTicket();renderSkip();
+  logEl.innerHTML="";print("info","Bane "+L.id+" er klar. Skriv koden og tryk Kør (eller Ctrl+Enter).");
+  if(L.random)print("info","Ruten ændrer sig, hver gang du kører. Din kode bliver testet på flere ruter.");
+  syncMe();
+}
+$("#run").onclick=run;
+$("#reset").onclick=()=>{resetAnim();$("#win").hidden=true;setStatus("idle","Klar");setRunning(false);print("info","Kortet er nulstillet.");};
+$("#restore").onclick=()=>{ta.value=LEVELS[PROG.level].starter;refresh();ta.focus();print("info","Koden er sat tilbage til start.");};
+$("#clear").onclick=()=>{logEl.innerHTML="";};
+$("#hintBtn").onclick=()=>{PROG.hints[PROG.level]=true;saveProg();renderTicket();print("warn","Hint vist. Banen giver nu højst 70 point.");syncMe();};
+$("#skipBtn").onclick=()=>{PROG.skipped[PROG.level]=true;saveProg();print("info","Bane "+(PROG.level+1)+" er sprunget over. Du kan altid komme tilbage.");loadLevel(PROG.level+1);};
+$("#againBtn").onclick=()=>{$("#win").hidden=true;resetAnim();setStatus("idle","Klar");ta.focus();};
+$("#nextBtn").onclick=()=>{if(PROG.level<LEVELS.length-1)loadLevel(PROG.level+1);};
+const SPEEDS=[1,2,4];
+$("#speed").onclick=()=>{speed=SPEEDS[(SPEEDS.indexOf(speed)+1)%SPEEDS.length];$("#speed").textContent=speed+"×";};
+
+/* =====================================================================
+   SCOREBOARD
+   ===================================================================== */
+const ago=t=>{const s=Math.max(0,Math.round((now()-Date.parse(t))/1000));if(s<10)return "lige nu";if(s<60)return "for "+s+" s siden";const m=Math.round(s/60);return m<60?"for "+m+" min siden":"for "+Math.round(m/60)+" t siden";};
+const ranked=ps=>ps.slice().sort((a,b)=>(b.score||0)-(a.score||0)||(b.solved||0)-(a.solved||0)||String(a.updated_at).localeCompare(String(b.updated_at)));
+const rowEls=new Map(),lastScore=new Map();
+const ROWH=61;
+function maxRows(){const fit=matchMedia("(min-width:1000px) and (min-height:600px)").matches;if(!fit)return 20;const h=$("#rankBox").clientHeight;return Math.max(3,Math.floor((h-44)/ROWH));}
+function renderBoard(){
+  const v=view(),list=ranked(v.players),cap=maxRows(),top=list.length>cap?list.slice(0,cap):list,ol=$("#rank");
+  $("#sbUrl").textContent=location.href.split("#")[0].replace(/^https?:\/\//,"");
+  $("#sbSub").textContent=list.length+" spiller"+(list.length===1?"":"e")+" · "+LEVELS.length+" baner · op til 100 point pr. bane";
+  $("#rankEmpty").hidden=list.length>0;
+  const first=new Map();rowEls.forEach((el,id)=>first.set(id,el.getBoundingClientRect().top));
+  const keep=new Set();
+  top.forEach((p,i)=>{
+    let el=rowEls.get(p.id),isNew=false;
+    if(!el){el=document.createElement("li");el.className="rrow";el.innerHTML='<span class="rk"></span><span class="nm"></span><span class="prog"></span><span class="pts"></span>';rowEls.set(p.id,el);isNew=true;}
+    el.classList.toggle("lead",i===0&&(p.score||0)>0);
+    el.querySelector(".rk").textContent=i+1;
+    el.querySelector(".nm").innerHTML=esc(p.name)+(ME&&p.id===ME.id?"<small>dig</small>":"");
+    const solved=p.solved||0;el.querySelector(".prog").innerHTML=Array.from({length:LEVELS.length},(_,k)=>'<i class="'+(k<solved?"on":"")+'"></i>').join("");
+    el.querySelector(".pts").textContent=p.score||0;
+    const prev=lastScore.get(p.id);if(prev!=null&&prev!==(p.score||0)&&!reduce){el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");}
+    lastScore.set(p.id,p.score||0);
+    ol.appendChild(el);keep.add(p.id);el._new=isNew;
+  });
+  rowEls.forEach((el,id)=>{if(!keep.has(id)){el.remove();rowEls.delete(id);}});
+  if(!reduce&&!$("#view-scoreboard").hidden)rowEls.forEach((el,id)=>{
+    const f=first.get(id);
+    if(f==null||el._new){el.animate([{opacity:0,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:300,easing:"ease-out"});return;}
+    const d=f-el.getBoundingClientRect().top;if(Math.abs(d)>1)el.animate([{transform:"translateY("+d+"px)"},{transform:"none"}],{duration:500,easing:"cubic-bezier(.2,.8,.2,1)"});
+  });
+  const more=$("#more");more.hidden=list.length<=top.length;more.textContent="+ "+(list.length-top.length)+" flere spillere";
+  const ev=v.events.slice().reverse().slice(0,14);
+  $("#feedEmpty").hidden=ev.length>0;
+  $("#feed").innerHTML=ev.map(e=>{
+    const L=LEVELS[Math.min(LEVELS.length-1,Math.max(0,(e.level||1)-1))];let what,gain="";
+    if(e.kind==="solve"){what="<b>"+esc(e.name)+"</b> klarede "+esc(L.title);gain="+"+e.points;}
+    else if(e.kind==="improve"){what="<b>"+esc(e.name)+"</b> forbedrede "+esc(L.title);gain="+"+e.points;}
+    else if(e.kind==="finish"){what="<b>"+esc(e.name)+"</b> har klaret alle "+LEVELS.length+" baner";gain=LEVELS.length+"/"+LEVELS.length;}
+    else what="<b>"+esc(e.name)+"</b> er med";
+    return '<li><span class="what">'+what+'</span><span class="gain">'+gain+'</span><span class="when">'+ago(e.created_at)+'</span></li>';
+  }).join("");
+}
+
+/* =====================================================================
+   PANEL
+   ===================================================================== */
+const STATUS_ORDER={fast:0,"i-gang":1,inaktiv:2,faerdig:3};
+function statusOf(p){
+  if((p.solved||0)>=LEVELS.length)return ["faerdig","Færdig"];
+  const sinceAct=(now()-Date.parse(p.updated_at||0))/60000,onLevel=(now()-Date.parse(p.level_started_at||p.updated_at||0))/60000;
+  if((p.attempts||0)>=6||onLevel>6)return ["fast","Sidder fast"];
+  if(sinceAct>4)return ["inaktiv","Inaktiv"];
+  return ["i-gang","I gang"];
+}
+const mins=t=>{const m=Math.max(0,Math.floor((now()-Date.parse(t||0))/60000));return m<1?"< 1 min":m+" min";};
+const adminOn=()=>!!SS.get("route-eu.pin.v3","");
+let armed=null,armTimer=null;
+function arm(key){armed=key;clearTimeout(armTimer);armTimer=setTimeout(()=>{armed=null;renderPanel();},4000);}
+function renderPanel(){
+  $("#gate").hidden=adminOn();$("#panelBody").hidden=!adminOn();
+  if(!adminOn())return;
+  const v=view(),ps=v.players.map(p=>Object.assign({},p,{st:statusOf(p)}));
+  const n=ps.length,fast=ps.filter(p=>p.st[0]==="fast").length,done=ps.filter(p=>p.st[0]==="faerdig").length,going=ps.filter(p=>p.st[0]==="i-gang").length;
+  const avg=n?(ps.reduce((a,p)=>a+(p.solved||0),0)/n).toFixed(1).replace(".",","):"0";
+  $("#stats").innerHTML=[["Spillere",n],["I gang",going],["Sidder fast",fast,"warn"],["Færdige",done],["Gns. løste baner",avg]].map(([l,b,c])=>'<div class="stat"><b class="'+(c&&b>0?c:"")+'">'+b+'</b><span class="lbl">'+l+'</span></div>').join("");
+  ps.sort((a,b)=>STATUS_ORDER[a.st[0]]-STATUS_ORDER[b.st[0]]||(a.level||0)-(b.level||0)||a.name.localeCompare(b.name,"da"));
+  $("#ptEmpty").hidden=n>0;
+  $("#ptbody").innerHTML=ps.map(p=>{const L=LEVELS[Math.min(LEVELS.length-1,Math.max(0,(p.level||1)-1))],sure=armed==="p:"+p.id;
+    return '<tr class="'+(p.st[0]==="fast"?"fast":"")+'"><td class="nm">'+esc(p.name)+'</td><td>'+(p.level||1)+' · '+esc(L.title)+'</td><td class="num">'+(p.solved||0)+'/'+LEVELS.length+'</td><td class="num">'+(p.score||0)+'</td><td class="num">'+(p.attempts||0)+'</td><td class="num">'+((p.solved||0)>=LEVELS.length?"–":mins(p.level_started_at))+'</td><td class="num">'+ago(p.updated_at)+'</td><td><span class="st" data-s="'+p.st[0]+'">'+p.st[1]+'</span></td><td style="text-align:right;padding-right:24px"><button class="btn sm '+(sure?"danger":"quiet")+'" data-rm="'+esc(p.id)+'">'+(sure?"Bekræft":"Fjern")+'</button></td></tr>';}).join("");
+  const local=store&&store.mode==="local";
+  $("#modeLine").textContent=VERSION+" · "+(storeWarn?storeWarn+" ":"")+(local
+    ?"Lokal tilstand: data deles kun mellem faner i denne browser. Udfyld Supabase i CONFIG for at køre live med en klasse."
+    :"Live via Supabase. Alt opdateres med det samme.")+(snap.paused?" · Pause er slået til: eleverne ser PAUSE, KIG OP.":"");
+  const pb=$("#pauseBtn");pb.textContent=snap.paused?"Fortsæt spillet":"Sæt pause";pb.classList.toggle("on",!!snap.paused);
+  $("#linkTxt").textContent=location.href.split("#")[0];
+  const cr=$("#clearRound");cr.textContent=armed==="clear"?"Bekræft: slet alt":"Ryd runden";
+}
+$("#ptbody").addEventListener("click",async e=>{
+  const b=e.target.closest("[data-rm]");if(!b)return;const id=b.dataset.rm;
+  if(armed!=="p:"+id){arm("p:"+id);renderPanel();return;}
+  armed=null;b.disabled=true;
+  try{await store.removePlayer(id);$("#clearMsg").textContent="Spilleren er fjernet.";}catch(err){$("#clearMsg").textContent=err.message||String(err);}
+  renderPanel();
+});
+$("#clearRound").onclick=async()=>{
+  if(armed!=="clear"){arm("clear");renderPanel();return;}
+  armed=null;
+  try{await store.clear();rowEls.forEach(el=>el.remove());rowEls.clear();lastScore.clear();$("#clearMsg").textContent="Alle spillere og point er slettet.";}
+  catch(err){$("#clearMsg").textContent=err.message||String(err);}
+  renderPanel();
+};
+$("#pinForm").addEventListener("submit",async e=>{e.preventDefault();
+  const p=$("#pinIn").value.trim();if(!p)return;$("#pinBtn").disabled=true;
+  let ok=false;try{ok=await store.checkPin(p);}catch(err){$("#pinErr").textContent="Kunne ikke tjekke PIN: "+(err.message||err);$("#pinErr").hidden=false;$("#pinBtn").disabled=false;return;}
+  $("#pinBtn").disabled=false;
+  if(ok){SS.set("route-eu.pin.v3",p);$("#pinErr").hidden=true;$("#pinIn").value="";renderPanel();}
+  else{$("#pinErr").textContent="Forkert PIN-kode. Prøv igen.";$("#pinErr").hidden=false;$("#pinIn").select();}});
+$("#lockBtn").onclick=()=>{SS.del("route-eu.pin.v3");renderPanel();};
+$("#pauseBtn").onclick=async()=>{
+  const b=$("#pauseBtn");b.disabled=true;
+  try{await store.setPaused(!snap.paused);}catch(err){$("#clearMsg").textContent=err.message||String(err);}
+  b.disabled=false;renderPanel();
+};
+$("#copyLink").onclick=async e=>{const url=location.href.split("#")[0],b=e.currentTarget;try{await navigator.clipboard.writeText(url);b.textContent="Kopieret";}catch(err){b.textContent="Markér teksten";}setTimeout(()=>{b.textContent="Kopiér link";},1800);};
+
+/* =====================================================================
+   LOGIN + NAVIGATION
+   ===================================================================== */
+$("#loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const name=$("#nameIn").value.trim().replace(/\s+/g," "),code=ROOM,err=$("#loginErr");
+  const fail=m=>{err.textContent=m;err.hidden=false;};
+  if(name.length<2)return fail("Skriv dit navn (mindst 2 bogstaver).");
+  if(!/^[\p{L} .'-]+$/u.test(name))return fail("Brug kun bogstaver i dit navn.");
+  $("#loginBtn").disabled=true;
+  if(!store||store.code!==code){ROOM=code;await openStore(code);}
+  const taken=Object.values(snap.players||{}).some(p=>p.name.toLowerCase()===name.toLowerCase());
+  $("#loginBtn").disabled=false;
+  if(taken)return fail("Navnet "+name+" er allerede taget. Tilføj fx første bogstav i dit efternavn.");
+  err.hidden=true;
+  ME={id:uuid(),name,code,joined:iso(now())};LS.set("route-eu.me.v3",ME);ROOM=code;
+  loadProg();PROG.started[0]=now();saveProg();variant=null;
+  syncMe();sendEvent("join");
+  location.hash="spil";route();
+});
+function logout(){LS.del("route-eu.me.v3");ME=null;loadProg();variant=null;renderMe();$("#nameIn").value="";location.hash="spil";route();}
+function setTab(r){["spil","scoreboard","panel"].forEach(k=>{$("#tab-"+k).setAttribute("aria-selected",k===r?"true":"false");$("#view-"+k).hidden=k!==r;});}
+function route(){
+  let r=(location.hash||"").slice(1);if(!["spil","scoreboard","panel"].includes(r))r="spil";
+  if(r==="spil"&&!ME){
+    $("#app").hidden=true;$("#login").hidden=false;renderPause();
+    $("#loginWarn").hidden=!storeWarn;$("#loginWarn").textContent=storeWarn;
+    setTimeout(()=>{try{$("#nameIn").focus({preventScroll:true});}catch(e){}},0);return;
+  }
+  $("#login").hidden=true;$("#app").hidden=false;setTab(r);renderMe();renderPause();
+  if(r==="spil"){if(!variant)loadLevel(PROG.level||0);else{layout();dirty=true;}}
+  renderLive();
+}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{location.hash=b.dataset.route;});
+window.addEventListener("hashchange",route);
+window.addEventListener("resize",()=>{if(!$("#view-scoreboard").hidden)renderBoard();});
+function renderPause(){
+  const onPanel=!$("#app").hidden&&!$("#view-panel").hidden;
+  $("#pause").hidden=!(snap.paused&&!onPanel);
+}
+function renderLive(){renderPause();if(!$("#view-scoreboard").hidden)renderBoard();if(!$("#view-panel").hidden)renderPanel();}
+setInterval(renderLive,5000);
+
+/* ---------- EU-stjernering ---------- */
+document.querySelectorAll(".ring").forEach(svg=>{let h="";for(let i=0;i<12;i++){const a=i*Math.PI/6-Math.PI/2;h+='<polygon style="fill:var(--yellow)" points="'+starPts(22+Math.cos(a)*16,22+Math.sin(a)*16,3.4).map(p=>p.map(n=>n.toFixed(2)).join(",")).join(" ")+'"/>';}svg.innerHTML=h;});
+
+/* ---------- Start ---------- */
+(async function boot(){
+  readTheme();loadProg();
+  if(PROG.level>=LEVELS.length||!unlocked(PROG.level))PROG.level=0;
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{readTheme();dirty=true;});
+  await openStore(ROOM);
+  route();
+  requestAnimationFrame(frame);
+})();
+})();
+</script>
+
+</body>
+</html>
