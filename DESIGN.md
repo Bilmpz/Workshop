@@ -1,41 +1,40 @@
-# ROUTE//EU · Design v0.5
+# ROUTE//EU · Design
 
 ## Idé
-Et europæisk vejskilt. EU-blå flader, gul vejstribe som eneste accent, hvid skiltekant, skarpe hjørner. Skriften er **Overpass**, bygget på de skrifter, man bruger på motorvejsskilte. Koden står i **Overpass Mono**.
+Et stramt arbejdsværktøj. Lys, neutral flade, én blå accent og tynde linjer, ligesom en kodeeditor. Skriften er **IBM Plex Sans** med tabel-tal overalt. Koden står i **IBM Plex Mono**. EU-stjerneringen er logoet og står i accentfarven.
 
-Fladen er delt op med tynde streger som en kodeeditor, i stedet for svævende afrundede kort. På en computer passer alt på én skærm uden at rulle.
+På en computer passer alt på én skærm uden at rulle.
 
 ## Fanen og favicon
-Fanen hedder **Oliver & Idas oplæg** på alle sider. Faviconet er et skiltblåt felt med hvid kant og EU's 12 stjerner. Begge står øverst i `index.html`.
+Fanen hedder **Oliver & Idas oplæg** på alle sider. Faviconet er et accentblåt felt med 12 hvide stjerner. Begge står øverst i `index.html`.
 
 ## Regler
-- **Én accent:** gul bruges kun til den primære knap, den nuværende bane, målet, førerpladsen og point.
-- **Skarpe kanter:** 3 px på knapper og felter, 0 på paneler. Ingen piller. Status vises som en lille firkant + versaler.
-- **Store kontraster i skrift:** overskrifter i vægt 900 og stramt spatieret, etiketter i 11 px mono med versaler. Intet midt imellem.
-- **Ingen pynt:** ingen gradienter, skygger eller ikoner i cirkler. Den eneste baggrundsdetalje er et svagt prikgitter bag kortet.
-- **Bevægelse:** én kort indgang (paneler glider 6 px op), lastbilens animation og konfetti ved levering. Intet andet.
+- **Én accent:** blå (`--accent`) bruges kun til primær knap, valgt fane/bane, færdig-status, førerpladsen og logoet. Rød og orange er signaler, ikke pynt: kun fejl/slet og "sidder fast".
+- **Hjørner:** `--r` (2 px) på alt med en kant. Paneler er flader uden hjørner.
+- **Linjer, ikke skygger:** paneler skilles med 1 px linjer. Kun det, der svæver (vinder-boksen, fejlboksen), har `--shadow-float`.
+- **Hierarki:** det vigtigste er klart størst: titlen på login, banens navn, scoreboardets point. Etiketter er 12 px versaler i `--text-3`.
+- **Afstande:** kun `--s-1` … `--s-8` (4/8/12/16/24/32/48/64).
+- **Ingen pynt:** ingen gradienter, prikgitter, emojis eller ikoner i cirkler.
+- **Bevægelse:** én kort indgang, lastbilen, konfetti ved levering og pulsen på PAUSE.
 
 ## Variabler (øverst i `<style>` i `index.html`)
 
-| Variabel | Nu | Bruges til |
-|---|---|---|
-| `--ink` | `#102A6E` | Dybeste flade: bag kortet, felter, streger mellem paneler |
-| `--surface` | `#173689` | Paneler |
-| `--surface-2` | `#1F44A0` | Hover på knapper |
-| `--sign` | `#2356D8` | Klar skiltblå: login-skiltet, pause-skærmen, målet på kortet |
-| `--line` / `--line-strong` | `#2C4DA8` / `#4566C4` | Streger / kanter på knapper og felter |
-| `--text` / `--text-2` / `--text-3` | hvid → dæmpet | Primær, sekundær og hjælpetekst |
-| `--yellow` / `--yellow-ink` | `#FFCC00` / `#06102A` | Accent / tekst på gul |
-| `--ok` / `--warn` / `--bad` | grøn / orange / rød | I gang / sidder fast / fejl |
-| `--code-*` | | Farver i kode-editoren |
-| `--map-hue` | `222` | Terrænets farvetone (0–360) |
-| `--map-land-l` | `21` | Terrænets lyshed i procent (højere = lysere kort) |
-| `--map-road`, `--map-edge`, `--map-package` | | Vej, vejkant, pakker |
-| `--font-ui` / `--font-mono` | Overpass / Overpass Mono | Skrift |
-| `--r` | `3px` | Hjørner på knapper og felter |
+| Variabel | Bruges til |
+|---|---|
+| `--bg` / `--surface` / `--surface-2` | Side og felter / paneler / hover |
+| `--line` / `--line-strong` | Streger / kanter på knapper og felter |
+| `--text` / `--text-2` / `--text-3` | Primær, sekundær og hjælpetekst |
+| `--accent`, `--accent-hover`, `--on-accent` | Accent og tekst på accent |
+| `--warn` / `--bad` | Sidder fast / fejl og slet (`--ok` peger på accenten) |
+| `--code-*` | Syntaksfarver i editoren |
+| `--map-*` | Alle farver på kortet (canvas læser dem ved start) |
+| `--font-ui` / `--font-mono` | Skrift |
+| `--fs-*`, `--w-*` | Skriftstørrelser og -vægte |
+| `--s-1` … `--s-8` | Afstande |
+| `--r`, `--bw`, `--bw-mark`, `--h-*`, `--mark-*` | Hjørner, linjer, højder, logostørrelser |
 
 ## Skift til de endelige farver
-1. Ret `--ink`, `--surface`, `--surface-2` til jeres blå toner (fra mørkest til lysest) og `--sign` til skiltblå.
-2. Ret `--yellow`.
-3. Hold `--text` tydelig på `--surface` (kontrast mindst 4,5:1).
-4. Vil I bruge AAU's skrift, så skift `--font-ui` og linket til Google Fonts øverst i filen.
+1. Ret `--accent` og `--accent-hover`. Hold kontrasten mod hvid på mindst 4,5:1.
+2. Vil I have et andet kort, så ret `--map-hue`, `--map-land-s`, `--map-land-l` og `--map-road`.
+3. Vil I bruge AAU's skrift, så skift `--font-ui` og linket til Google Fonts øverst i filen.
+4. Kortboksens padding må højst være 20 px, fordi `layout()` i scriptet trækker 40 px fra bredden.
