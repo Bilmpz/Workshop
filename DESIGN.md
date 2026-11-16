@@ -3,7 +3,7 @@
 ## Idé
 Et stramt arbejdsværktøj. Lys, neutral flade, én blå accent og tynde linjer, ligesom en kodeeditor. Skriften er **IBM Plex Sans** med tabel-tal overalt. Koden står i **IBM Plex Mono**. EU-stjerneringen er logoet og står i accentfarven.
 
-På en computer passer alt på én skærm uden at rulle.
+På en computer (fra 1000 px bredde, uanset højde) passer alt på én skærm uden at rulle. Spillet står i tre kolonner: opgave | kort + log | editor, så editoren får hele højden. På lave skærme strammes opgaveteksten og menulinjerne lidt (`max-height: 760px` og `640px` i `<style>`).
 
 ## Fanen og favicon
 Fanen hedder **Oliver & Idas oplæg** på alle sider. Faviconet er et accentblåt felt med 12 hvide stjerner. Begge står øverst i `index.html`.
