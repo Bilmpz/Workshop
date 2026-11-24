@@ -684,7 +684,7 @@ const CONFIG={
   ADMIN_PIN:"2026",       // bruges KUN uden Supabase
   ROUND:"AAU"             // intern rundekode; behøver ikke ændres
 };
-const VERSION="v0.5";
+const VERSION="v0.6";
 
 const $=s=>document.querySelector(s);
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -873,6 +873,8 @@ function localStore(code){
   if(bc)bc.onmessage=emit;
   const onStorage=e=>{if(e.key===KEY)emit();};window.addEventListener("storage",onStorage);
   return {mode:"local",code,
+    watch(){},
+    async names(){return Object.values(read().players||{}).map(p=>p.name);},
     upsertPlayer(p){const s=read();s.players[p.id]=Object.assign(s.players[p.id]||{},p);write(s);},
     addEvent(ev){const s=read();s.events.push(Object.assign({id:uuid()},ev));s.events=s.events.slice(-100);write(s);},
     async checkPin(p){return p===CONFIG.ADMIN_PIN;},
@@ -891,22 +893,43 @@ async function liveStore(code){
   let adm=null;
   const admin=()=>{const pin=SS.get("route-eu.pin.v3","");if(!adm||adm._pin!==pin){adm=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY,Object.assign({global:{headers:{"x-admin-pin":pin}}},opts));adm._pin=pin;}return adm;};
   const state={players:{},events:[],paused:false},subs=new Set(),emit=()=>subs.forEach(f=>f(state));
-  const r1=await sb.from("players").select("*").eq("session",code);
-  if(r1.error)throw new Error(r1.error.message);
-  (r1.data||[]).forEach(p=>state.players[p.id]=p);
-  const r2=await sb.from("events").select("*").eq("session",code).order("created_at",{ascending:false}).limit(100);
-  state.events=(r2.data||[]).reverse();
-  const r3=await sb.from("rooms").select("paused").eq("session",code).maybeSingle();
-  state.paused=!!(r3.data&&r3.data.paused);
+  // Forbindelsestjek: fejler det, falder siden tilbage til lokal tilstand med en advarsel.
+  const r0=await sb.from("players").select("id").eq("session",code).limit(1);
+  if(r0.error)throw new Error(r0.error.message);
+  const loadPause=async()=>{
+    const r=await sb.from("rooms").select("paused").eq("session",code).maybeSingle();
+    if(!r.error){state.paused=!!(r.data&&r.data.paused);emit();}
+  };
+  const newer=(a,b)=>Date.parse(a.updated_at||0)>Date.parse(b.updated_at||0);
+  const loadBoard=async()=>{
+    const r1=await sb.from("players").select("*").eq("session",code);
+    if(r1.error)return;
+    const r2=await sb.from("events").select("*").eq("session",code).order("created_at",{ascending:false}).limit(100);
+    const ps={};(r1.data||[]).forEach(p=>{const o=state.players[p.id];ps[p.id]=o&&newer(o,p)?o:p;});
+    state.players=ps;if(!r2.error)state.events=(r2.data||[]).reverse();emit();
+  };
+  await loadPause();
+  /* Live-kanaler. Hver ændring sendes til alle, der lytter på den, så elevernes spilside
+     lytter KUN efter pause. Spillere og point følges kun, mens Scoreboard eller Panel er åbent
+     (se watch). Ellers ville hver kørsel blive sendt til hele klassen, og Supabases loft på
+     100 beskeder i sekundet rammes ved ca. 40 elever. */
   const ch=sb.channel("room-"+code)
     .on("postgres_changes",{event:"*",schema:"public",table:"rooms",filter:"session=eq."+code},m=>{if(m.new){state.paused=!!m.new.paused;emit();}})
-    .on("postgres_changes",{event:"INSERT",schema:"public",table:"players",filter:"session=eq."+code},m=>{state.players[m.new.id]=m.new;emit();})
-    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"players",filter:"session=eq."+code},m=>{state.players[m.new.id]=m.new;emit();})
-    .on("postgres_changes",{event:"DELETE",schema:"public",table:"players"},m=>{if(m.old&&state.players[m.old.id]){delete state.players[m.old.id];emit();}})
-    .on("postgres_changes",{event:"INSERT",schema:"public",table:"events",filter:"session=eq."+code},m=>{state.events.push(m.new);state.events=state.events.slice(-100);emit();})
-    .on("postgres_changes",{event:"DELETE",schema:"public",table:"events"},m=>{const n=state.events.length;state.events=state.events.filter(e=>e.id!==(m.old&&m.old.id));if(state.events.length!==n)emit();})
-    .subscribe();
-  return {mode:"live",code,
+    .subscribe(st=>{if(st==="SUBSCRIBED")loadPause();});   // også efter et netværksudfald, så en mistet pause ikke hænger
+  let board=null;
+  const watch=on=>{
+    if(on&&!board){
+      board=sb.channel("board-"+code)
+        .on("postgres_changes",{event:"INSERT",schema:"public",table:"players",filter:"session=eq."+code},m=>{state.players[m.new.id]=m.new;emit();})
+        .on("postgres_changes",{event:"UPDATE",schema:"public",table:"players",filter:"session=eq."+code},m=>{state.players[m.new.id]=m.new;emit();})
+        .on("postgres_changes",{event:"DELETE",schema:"public",table:"players"},m=>{if(m.old&&state.players[m.old.id]){delete state.players[m.old.id];emit();}})
+        .on("postgres_changes",{event:"INSERT",schema:"public",table:"events",filter:"session=eq."+code},m=>{state.events.push(m.new);state.events=state.events.slice(-100);emit();})
+        .on("postgres_changes",{event:"DELETE",schema:"public",table:"events"},m=>{const n=state.events.length;state.events=state.events.filter(e=>e.id!==(m.old&&m.old.id));if(state.events.length!==n)emit();})
+        .subscribe(st=>{if(st==="SUBSCRIBED")loadBoard();});   // hent hele listen, når kanalen er klar (og igen efter udfald)
+    }else if(!on&&board){sb.removeChannel(board);board=null;}
+  };
+  return {mode:"live",code,watch,
+    async names(){const r=await sb.from("players").select("name").eq("session",code);if(r.error)throw new Error(r.error.message);return (r.data||[]).map(p=>p.name);},
     async upsertPlayer(p){state.players[p.id]=Object.assign(state.players[p.id]||{},p);emit();const {error}=await sb.from("players").upsert(state.players[p.id]);if(error)console.warn(error);},
     async addEvent(ev){const {error}=await sb.from("events").insert(ev);if(error)console.warn(error);},
     async checkPin(p){const {data,error}=await sb.rpc("check_pin",{p});if(error)throw new Error(error.message);return data===true;},
@@ -929,7 +952,7 @@ async function liveStore(code){
       state.paused=!!p;emit();
     },
     subscribe(f){subs.add(f);f(state);return ()=>subs.delete(f);},
-    close(){subs.clear();sb.removeChannel(ch);}
+    close(){subs.clear();sb.removeChannel(ch);if(board){sb.removeChannel(board);board=null;}}
   };
 }
 let store=null,snap={players:{},events:[]},storeWarn="";
@@ -1412,7 +1435,9 @@ $("#loginForm").addEventListener("submit",async e=>{
   if(!/^[\p{L} .'-]+$/u.test(name))return fail("Brug kun bogstaver i dit navn.");
   $("#loginBtn").disabled=true;
   if(!store||store.code!==code){ROOM=code;await openStore(code);}
-  const taken=Object.values(snap.players||{}).some(p=>p.name.toLowerCase()===name.toLowerCase());
+  // Frisk navneliste fra databasen: spilsiden følger ikke længere de andre spillere live.
+  let names;try{names=await store.names();}catch(e2){names=Object.values(snap.players||{}).map(p=>p.name);}
+  const taken=names.some(n=>String(n).toLowerCase()===name.toLowerCase());
   $("#loginBtn").disabled=false;
   if(taken)return fail("Navnet "+name+" er allerede taget. Tilføj fx første bogstav i dit efternavn.");
   err.hidden=true;
@@ -1425,6 +1450,7 @@ function logout(){LS.del("route-eu.me.v3");ME=null;loadProg();variant=null;rende
 function setTab(r){["spil","scoreboard","panel"].forEach(k=>{$("#tab-"+k).setAttribute("aria-selected",k===r?"true":"false");$("#view-"+k).hidden=k!==r;});}
 function route(){
   let r=(location.hash||"").slice(1);if(!["spil","scoreboard","panel"].includes(r))r="spil";
+  if(store)store.watch(r==="scoreboard"||r==="panel");   // spillere/point følges kun på Scoreboard og Panel
   if(r==="spil"&&!ME){
     $("#app").hidden=true;$("#login").hidden=false;renderPause();
     $("#loginWarn").hidden=!storeWarn;$("#loginWarn").textContent=storeWarn;
