@@ -679,8 +679,8 @@ function simulate(level, code){
    I live-tilstand tjekkes PIN-koden i databasen (tabellen admin_secret), ikke her.
    ===================================================================== */
 const CONFIG={
-  SUPABASE_URL:"",        // fx "https://abcdefgh.supabase.co"
-  SUPABASE_ANON_KEY:"",   // "anon public"-nøglen fra Supabase → Project settings → API
+  SUPABASE_URL:"https://azgwfkevijzrvgrheqeb.supabase.co",
+  SUPABASE_ANON_KEY:"sb_publishable_x2YSt8MfjV1FRwaOdEiUAw_cfPMoAK7",   // publishable-nøglen (sb_publishable_…) fra Supabase → Project settings → API Keys. Må gerne være offentlig.
   ADMIN_PIN:"2026",       // bruges KUN uden Supabase
   ROUND:"AAU"             // intern rundekode; behøver ikke ændres
 };
@@ -885,7 +885,7 @@ function localStore(code){
 }
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error("kunne ikke hente Supabase-biblioteket"));document.head.appendChild(s);});}
 async function liveStore(code){
-  if(!window.supabase)await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js");
+  if(!window.supabase)await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2/dist/umd/supabase.js");
   const opts={auth:{persistSession:false,autoRefreshToken:false}};
   const sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY,opts);
   let adm=null;

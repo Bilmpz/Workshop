@@ -32,9 +32,17 @@ create table if not exists public.events (
 );
 create index if not exists events_session on public.events (session, created_at desc);
 
--- 2) Elevernes adgang (anon-nøglen) ----------------------------------------
+-- 2) Elevernes adgang (publishable-nøglen = rollen anon) --------------------
 alter table public.players enable row level security;
 alter table public.events  enable row level security;
+
+-- Adgang via API: kun det, spillet bruger. Skrevet ud, så filen virker ens på projekter,
+-- der åbner nye tabeller automatisk, og på nyere projekter, der ikke gør
+-- (dér svarer databasen ellers "permission denied").
+revoke all on public.players, public.events from anon, authenticated;
+grant usage on schema public to anon;
+grant select, insert, update, delete on public.players to anon;
+grant select, insert, delete         on public.events  to anon;
 
 drop policy if exists "alle kan se spillere"    on public.players;
 drop policy if exists "elever kan oprette sig"  on public.players;
@@ -54,6 +62,7 @@ create policy "elever kan sende events" on public.events for insert to anon
 -- 3) Underviser-PIN (ligger kun i databasen, ikke i koden) -----------------
 create table if not exists public.admin_secret (pin text not null);
 alter table public.admin_secret enable row level security;   -- ingen policies = ingen kan læse den udefra
+revoke all on public.admin_secret from anon, authenticated;
 delete from public.admin_secret;
 insert into public.admin_secret (pin) values ('SKIFT-MIG');
 
@@ -81,6 +90,8 @@ create table if not exists public.rooms (
   updated_at timestamptz default now()
 );
 alter table public.rooms enable row level security;
+revoke all on public.rooms from anon, authenticated;
+grant select, insert, update on public.rooms to anon;
 drop policy if exists "alle kan se pause"          on public.rooms;
 drop policy if exists "underviser opretter pause"  on public.rooms;
 drop policy if exists "underviser ændrer pause"    on public.rooms;
